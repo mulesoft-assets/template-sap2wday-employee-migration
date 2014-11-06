@@ -1,0 +1,466 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	version="1.0">
+	<xsd:element name="BAPI_USER_GETLIST">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="import" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:all>
+							<xsd:element name="MAX_ROWS" minOccurs="0" maxOccurs="1">
+								<xsd:annotation>
+									<xsd:documentation>Maximum Number of Lines of Hits</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:simpleContent>
+										<xsd:extension base="xsd:string" />
+									</xsd:simpleContent>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="WITH_USERNAME" minOccurs="0"
+								maxOccurs="1">
+								<xsd:annotation>
+									<xsd:documentation>Read User with Name</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:simpleContent>
+										<xsd:extension base="xsd:string" />
+									</xsd:simpleContent>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:all>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="export" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:all>
+							<xsd:element name="ROWS" minOccurs="0" maxOccurs="1">
+								<xsd:annotation>
+									<xsd:documentation>No. of users selected</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:simpleContent>
+										<xsd:extension base="xsd:string" />
+									</xsd:simpleContent>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:all>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="tables" minOccurs="0" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:all>
+							<xsd:element name="RETURN" minOccurs="0" maxOccurs="1">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="row" minOccurs="0" maxOccurs="unbounded">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="TYPE" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message type: S Success, E Error, W
+																Warning, I Info, A Abort</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="ID" minOccurs="0" maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Class</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="NUMBER" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Number</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="MESSAGE" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Text</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="LOG_NO" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Application log: log number</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="LOG_MSG_NO" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Application log: Internal message
+																serial number</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="MESSAGE_V1" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Variable</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="MESSAGE_V2" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Variable</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="MESSAGE_V3" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Variable</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="MESSAGE_V4" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Message Variable</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="PARAMETER" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Parameter Name</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="ROW" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Lines in parameter</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FIELD" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Field in parameter</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="SYSTEM" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Logical system from which message
+																originates</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+												<xsd:attribute name="id" type="xsd:integer"
+													use="required" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="SELECTION_EXP" minOccurs="0"
+								maxOccurs="1">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="row" minOccurs="0" maxOccurs="unbounded">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="LOGOP" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Logical operation</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="ARITY" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Priority of logical operation</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="PARAMETER" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Parameter Name</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FIELD" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Field in the Parameter</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="OPTION" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>ABAP: Selection option (EQ/BT/CP/...)</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="LOW" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>ABAP/4: Selection value (LOW or HIGH
+																value, external format)</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="HIGH" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>ABAP/4: Selection value (LOW or HIGH
+																value, external format)</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+												<xsd:attribute name="id" type="xsd:integer"
+													use="required" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="SELECTION_RANGE" minOccurs="0"
+								maxOccurs="1">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="row" minOccurs="0" maxOccurs="unbounded">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="PARAMETER" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Parameter Name</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FIELD" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Field in the Parameter</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="SIGN" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Inclusion/exclusion criterion SIGN for
+																range tables</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="OPTION" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Selection operator OPTION for range
+																tables</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="LOW" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>'Generic' SELECT-OPTION for Dynamic
+																Selections</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="HIGH" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>'Generic' SELECT-OPTION for Dynamic
+																Selections</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+												<xsd:attribute name="id" type="xsd:integer"
+													use="required" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="USERLIST" minOccurs="0" maxOccurs="1">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="row" minOccurs="0" maxOccurs="unbounded">
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="USERNAME" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>User Name in User Master Record</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FIRSTNAME" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>First name</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="LASTNAME" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Last name</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FULLNAME" minOccurs="0"
+														maxOccurs="1">
+														<xsd:annotation>
+															<xsd:documentation>Full Name of Person</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:simpleContent>
+																<xsd:extension base="xsd:string" />
+															</xsd:simpleContent>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+												<xsd:attribute name="id" type="xsd:integer"
+													use="required" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:all>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

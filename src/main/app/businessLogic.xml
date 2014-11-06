@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
+http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd">
+    <data-mapper:config name="XML_To_Map" transformationGraphPath="xml_to_map.grf" doc:name="XML_To_Map"/>
+
+
+    <batch:job name="migrateUsersBatch" max-failed-records="-1">
+        <batch:threading-profile poolExhaustedAction="WAIT"/>
+        <batch:input>
+            <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
+            <logger message="XXXX #[payload]" level="INFO" doc:name="Logger"/>
+        </batch:input>
+ 
+        <batch:process-records>
+
+            <batch:step name="getUserInWdayStep">
+                <enricher source="#[payload]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
+                    <wd-hr:get-workers config-ref="Workday_Human_Resource" workersRequest-ref="#[org.mule.templates.WorkersRequest.getWorker(payload['ExtId__c'])]" doc:name="query Workday for existing worker"/>
+                </enricher>
+
+ 
+            </batch:step>
+            <batch:step name="selectNewerUserStep" filter-expression="#[recordVars['userInSalesforce'] is NullPayload]">
+
+                <choice doc:name="Choice">
+                    <when expression="#[org.mule.templates.UserDateComparator.isAfter(payload, recordVars['userInSalesforce'])]">
+                        <expression-component doc:name="define Id in SalesForce instance"><![CDATA[// Put ID from the object in B so that SalesForce updates this object
+ payload.put('Id', recordVars['userInSalesforce']['Id']);]]></expression-component> 
+                    </when>
+                    <otherwise>
+                        <set-payload doc:name="set to null to skip this user" value="#[return null]"/>
+                    </otherwise>
+                </choice>
+            </batch:step>
+
+        </batch:process-records>
+        <batch:on-complete>
+            <scatter-gather doc:name="All">
+                <processor-chain>
+            		<json:object-to-json-transformer doc:name="transform BatchJobInstance to JSON"/>
+            		<logger message="Migration process has finished: #[payload]" level="INFO" doc:name="log 'Migration process has finished'"/>
+                </processor-chain>
+				<processor-chain>
+                	<json:object-to-json-transformer doc:name="transform BatchJobInstance to JSON"/>
+					<smtp:outbound-endpoint host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" to="${mail.to}" from="${mail.from}" subject="${mail.subject}" responseTimeout="10000" connector-ref="gmailConnector" doc:name="send mail"/>
+				</processor-chain>
+            </scatter-gather>
+        </batch:on-complete>
+    </batch:job>
+    <flow name="mainFlow" doc:name="mainFlow" processingStrategy="synchronous" doc:description="This flow is the entry point to the Kick business logic.
+
+This flow should control the direction of the application, and it should be called by the different endpoints that your Kick exposes to trigger it.
+
+">
+        <batch:execute name="migrateUsersBatch" doc:name="trigger migrateUsersBatch"/>
+        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="catch Exception and call defaultChoiceExceptionStrategy"/>
+    </flow>
+    
+    
+</mule>
