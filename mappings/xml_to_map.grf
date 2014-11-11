@@ -12,6 +12,7 @@
 <Field __index="3" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/Gender" containerType="SINGLE" label="Gender" name="Gender" type="string"/>
 <Field __index="1" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/LastName" containerType="SINGLE" label="LastName" name="LastName" type="string"/>
 <Field __index="2" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/Title" containerType="SINGLE" label="Title" name="Title" type="string"/>
+<Field __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/PersonalNumber" containerType="SINGLE" label="PersonalNumber" name="PersonalNumber" type="string"/>
 </Record>
 </Metadata>
 <Metadata __index="0" __referenceCounter="1" __sourcePath="{}/BAPI_EMPLOYEE_GETDATA/tables/PERSONAL_DATA/row" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _metadataParentId="d3a325dd-7031-4f9d-bafb-d18fdfa4edb5" _parent_id="__parent_id" _type="Input" id="f5d2c3ed-5174-4fa2-8f3e-6bf92728595e">
@@ -106,7 +107,8 @@ output.__id = input.__id;
 output.FirstName = input.FIRSTNAME;
 output.Title = input.TITLE;
 output.Gender = input.GENDER;
-output.LastName = input.LAST_NAME;]]></attr>
+output.LastName = input.LAST_NAME;
+output.PersonalNumber = input.PERNO;]]></attr>
 </Node>
 <Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -116,12 +118,14 @@ output.LastName = input.LAST_NAME;]]></attr>
     <LastName>$0.LastName</LastName>
     <Title>$0.Title</Title>
     <Gender>$0.Gender</Gender>
+    <PersonalNumber>$0.PersonalNumber</PersonalNumber>
   </item>
   <item clover:inPort="1">
     <FirstName>$1.FirstName</FirstName>
     <LastName>$1.LastName</LastName>
     <Title>$1.Title</Title>
     <Gender>$1.Gender</Gender>
+    <PersonalNumber>$1.PersonalNumber</PersonalNumber>
   </item>
 </clover:collection>]]></attr>
 <attr name="_data_format"><![CDATA[MAP]]></attr>

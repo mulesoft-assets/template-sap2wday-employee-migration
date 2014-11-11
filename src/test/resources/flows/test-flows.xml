@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -12,12 +12,4 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
     <wd-staffing:config name="Workday_Staffing" staffingUser="${wday.user}" staffingPassword="${wday.password}" staffingEndpoint="${wday.endpoint}" doc:name="Workday Staffing">
         <wd-staffing:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
     </wd-staffing:config>
-    <data-mapper:config name="Pojo_To_ChangeLegalNameRequestType" transformationGraphPath="pojo_to_changelegalnamerequesttype.grf" doc:name="Pojo_To_ChangeLegalNameRequestType"/>
-
-
-    <sub-flow name="updateWorkdayEmployee" doc:name="updateWorkdayEmployee">
-        <data-mapper:transform config-ref="Pojo_To_ChangeLegalNameRequestType" doc:name="Pojo To ChangeLegalNameRequestType"/>
-        <wd-hr:change-legal-name config-ref="Workday_Human_Resource" doc:name="Workday Human Resource"/>
-    </sub-flow>
-    
 </mule>

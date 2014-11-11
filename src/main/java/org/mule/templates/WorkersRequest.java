@@ -6,61 +6,46 @@
 
 package org.mule.templates;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.workday.hr.EffectiveAndUpdatedDateTimeDataType;
-import com.workday.hr.GetWorkersRequestType;
-import com.workday.hr.TransactionLogCriteriaType;
-import com.workday.hr.WorkerRequestCriteriaType;
-import com.workday.hr.WorkerResponseGroupType;
+import com.workday.hr.EmployeeGetType;
+import com.workday.hr.EmployeeReferenceType;
+import com.workday.hr.ExternalIntegrationIDReferenceDataType;
+import com.workday.hr.IDType;
 
 public class WorkersRequest {
-
-	public static GetWorkersRequestType create(String startDate) throws ParseException, DatatypeConfigurationException {
-					
-		GetWorkersRequestType getWorkersType = new GetWorkersRequestType();
-				
-		EffectiveAndUpdatedDateTimeDataType dateRangeData = new EffectiveAndUpdatedDateTimeDataType();
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, -3);
-		dateRangeData.setUpdatedThrough(xmlDate(cal.getTime()));
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		dateRangeData.setUpdatedFrom(xmlDate(sdf.parse(startDate)));
-		
-		WorkerRequestCriteriaType crit = new WorkerRequestCriteriaType();
-		List<TransactionLogCriteriaType> transactionLogCriteriaData = new ArrayList<TransactionLogCriteriaType>();
-		TransactionLogCriteriaType log = new TransactionLogCriteriaType();
-		log.setTransactionDateRangeData(dateRangeData);
-		
-		transactionLogCriteriaData.add(log );
-		crit.setTransactionLogCriteriaData(transactionLogCriteriaData );
-		getWorkersType.setRequestCriteria(crit );
-		crit.setExcludeInactiveWorkers(true);
-		WorkerResponseGroupType resGroup = new WorkerResponseGroupType();
-		resGroup.setIncludeRoles(true);	
-		resGroup.setIncludePersonalInformation(true);
-		resGroup.setIncludeOrganizations(true);
-		resGroup.setIncludeEmploymentInformation(true);	
-		resGroup.setIncludeUserAccount(true);
-		resGroup.setIncludeTransactionLogData(true);
-		resGroup.setIncludeManagementChainData(true);
-		resGroup.setIncludeReference(true);
-		
-		getWorkersType.setResponseGroup(resGroup);
-		
-		return getWorkersType;
-	}
 	
+	public static EmployeeGetType createEmployeeRequest(String value) throws Exception{
+		final GregorianCalendar gcalendar = new GregorianCalendar();
+		gcalendar.setTime(new Date());
+		final XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcalendar);
+
+		final EmployeeGetType employeeGetType = new EmployeeGetType();
+		final EmployeeReferenceType employeeReferenceType = new EmployeeReferenceType();
+		final ExternalIntegrationIDReferenceDataType extIdReference = new ExternalIntegrationIDReferenceDataType();
+		
+		final IDType idType = new IDType();
+		//idType.setSystemID("Jobvite");
+		idType.setSystemID("Salesforce - Chatter");
+		idType.setValue(value);
+		
+		extIdReference.setID(idType);
+		employeeReferenceType.setIntegrationIDReference(extIdReference);
+
+		employeeGetType.setEmployeeReference(employeeReferenceType);
+		//employeeGetType.setAsOfDate(xmlDate);
+		//employeeGetType.setAsOfMoment(xmlDate);
+		
+//		EmployeeType employeeType = new EmployeeType();
+//		employeeType.getEmployeeData().get(0).getEmployeeID();
+		return employeeGetType;
+	}
+
 	private static XMLGregorianCalendar xmlDate(Date date) throws DatatypeConfigurationException {
 		GregorianCalendar gregorianCalendar = (GregorianCalendar) GregorianCalendar.getInstance();
 		gregorianCalendar.setTime(date);
