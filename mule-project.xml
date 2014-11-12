@@ -4,4 +4,5 @@
     <description></description>
     <muleExtension name="SAP" qualifier="org.mule.tooling.ui.contribution.sap.3.5.0"/>
     <muleExtension name="Workday Staffing" qualifier="org.mule.tooling.ui.contribution.wd-staffing"/>
+    <muleExtension name="Workday Human Resource" qualifier="org.mule.tooling.ui.contribution.wd-hr"/>
 </mule-project>

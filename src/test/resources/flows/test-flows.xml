@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
+<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
-http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd">
-    <wd-staffing:config name="Workday_Staffing" staffingUser="${wday.user}" staffingPassword="${wday.password}" staffingEndpoint="${wday.endpoint}" doc:name="Workday Staffing">
-        <wd-staffing:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
-    </wd-staffing:config>
+http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
+    <data-mapper:config name="Map_To_Xml_BAPI_PERSDATA_CREATE_" transformationGraphPath="map_to_xml_bapi_persdata_create_.grf" doc:name="Map_To_Xml_BAPI_PERSDATA_CREATE_"/>
+    <sub-flow name="createSapEmployeeSubflow" doc:name="createSapEmployeeSubflow">
+        <logger message="yyyyyy before upsert #[payload]" level="INFO" doc:name="Logger"/>
+        <data-mapper:transform config-ref="Map_To_Xml_BAPI_PERSDATA_CREATE_" doc:name="Map To BAPI PERSDATA CREATE"/>
+        <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_ADDREMPES_CREATESUCCESSOR" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP"/>
+        <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_PERSDATA_CREATE" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP"/>
+        <logger level="INFO" doc:name="Logger" message="yyyyy sap response #[payload]"/>
+    
+    </sub-flow>
+    <sub-flow name="queryWorkdayEmployeeSubflow" doc:name="queryWorkdayEmployeeSubflow">
+        <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="Workday Human Resource"/>
+    </sub-flow>
+
 </mule>

@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Z_EMPL_CREATE timestamp="1415699964139" version="1.0">
+<import>
+<ABKRS_023 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ABKRS_030 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ANRDE_012 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ANSSA_035 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ANSSA_044 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ARBST_061 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_003 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_010 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_020 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_027 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_033 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_042 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_051 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BEGDA_056 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BTRTL_022 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<BTRTL_029 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<CTU type="field" sapDescription="" sapType="CHAR" sapLength="1"/>
+<EMPCT_055 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<EMPCT_060 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_004 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_011 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_021 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_028 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_034 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_043 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_052 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ENDDA_057 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<GBDAT_016 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<GESC1_017 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<GESC3_018 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<GROUP type="field" sapDescription="" sapType="CHAR" sapLength="12"/>
+<HOLDDATE type="field" sapDescription="" sapType="DATE" sapLength="8"/>
+<KEEP type="field" sapDescription="" sapType="CHAR" sapLength="1"/>
+<LAND1_041 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<LAND1_050 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<MASSN_005 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<MODE type="field" sapDescription="" sapType="CHAR" sapLength="1"/>
+<MSTBR_026 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<NACHN_013 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<NODATA type="field" sapDescription="" sapType="CHAR" sapLength="1"/>
+<ORT01_037 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ORT01_046 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ORT02_038 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ORT02_047 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PERID_015 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PERNR_002 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PERSG_008 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PERSK_009 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PLANS_006 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PLANS_024 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PLANS_031 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PSTLZ_040 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<PSTLZ_049 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<SCHKZ_053 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<SCHKZ_058 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<SELEC_01_001 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<SPRSL_019 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<STATE_039 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<STATE_048 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<STRAS_036 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<STRAS_045 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<UPDATE type="field" sapDescription="" sapType="CHAR" sapLength="1"/>
+<USER type="field" sapDescription="" sapType="CHAR" sapLength="12"/>
+<VDSK1_025 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<VDSK1_032 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<VORNA_014 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<WERKS_007 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<WKWDY_062 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ZTERF_054 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+<ZTERF_059 type="field" sapDescription="" sapType="CHAR" sapLength="132"/>
+</import>
+<export>
+<SUBRC type="field" sapDescription="" sapType="INT" sapLength="4"/>
+</export>
+<tables>
+<MESSTAB type="table">
+<row id="0">
+<TCODE type="field" sapDescription="BDC Transaction code" sapType="CHAR" sapLength="20"/>
+<DYNAME type="field" sapDescription="Batch input module name" sapType="CHAR" sapLength="40"/>
+<DYNUMB type="field" sapDescription="Batch input screen number" sapType="CHAR" sapLength="4"/>
+<MSGTYP type="field" sapDescription="Batch input message type" sapType="CHAR" sapLength="1"/>
+<MSGSPRA type="field" sapDescription="Language ID of a message" sapType="CHAR" sapLength="1"/>
+<MSGID type="field" sapDescription="Batch input message ID" sapType="CHAR" sapLength="20"/>
+<MSGNR type="field" sapDescription="Batch input message number" sapType="CHAR" sapLength="3"/>
+<MSGV1 type="field" sapDescription="Variable part of a message" sapType="CHAR" sapLength="100"/>
+<MSGV2 type="field" sapDescription="Variable part of a message" sapType="CHAR" sapLength="100"/>
+<MSGV3 type="field" sapDescription="Variable part of a message" sapType="CHAR" sapLength="100"/>
+<MSGV4 type="field" sapDescription="Variable part of a message" sapType="CHAR" sapLength="100"/>
+<ENV type="field" sapDescription="Batch input monitoring activity" sapType="CHAR" sapLength="4"/>
+<FLDNAME type="field" sapDescription="Field name" sapType="CHAR" sapLength="132"/></row></MESSTAB>
+</tables>
+</Z_EMPL_CREATE>

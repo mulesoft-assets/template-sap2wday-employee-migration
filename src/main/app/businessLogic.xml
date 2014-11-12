@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
             <batch:step name="getUserInWdayStep" accept-policy="ALL">
                 <logger message="XXXX EXISTING USER  #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="Expression"><![CDATA[System.err.println("test");
-payload.put("PersonalNumber","90000035");]]></expression-component>
+//payload.put("PersonalNumber","90000035");]]></expression-component>
                 <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
                     <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="query Workday for existing worker"/>
                 </enricher>
