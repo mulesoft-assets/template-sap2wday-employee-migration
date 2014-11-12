@@ -29,7 +29,7 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
                 <expression-component doc:name="Expression"><![CDATA[System.err.println("test");
 //payload.put("PersonalNumber","90000035");]]></expression-component>
                 <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
-                    <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="query Workday for existing worker"/>
+                    <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="query Workday for existing employee"/>
                 </enricher>
                 <logger message="XXXX existing worker #[recordVars['existingWorker']]" level="INFO" doc:name="Logger"/>
             </batch:step>
