@@ -10,17 +10,19 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
-    <data-mapper:config name="Map_To_Xml_BAPI_PERSDATA_CREATE_" transformationGraphPath="map_to_xml_bapi_persdata_create_.grf" doc:name="Map_To_Xml_BAPI_PERSDATA_CREATE_"/>
+    <data-mapper:config name="Map_To_XML" transformationGraphPath="map_to_xml.grf" doc:name="Map_To_XML"/>
     <sub-flow name="createSapEmployeeSubflow" doc:name="createSapEmployeeSubflow">
         <logger message="yyyyyy before upsert #[payload]" level="INFO" doc:name="Logger"/>
-        <data-mapper:transform config-ref="Map_To_Xml_BAPI_PERSDATA_CREATE_" doc:name="Map To BAPI PERSDATA CREATE"/>
-        <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_ADDREMPES_CREATESUCCESSOR" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP"/>
-        <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_PERSDATA_CREATE" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP"/>
-        <logger level="INFO" doc:name="Logger" message="yyyyy sap response #[payload]"/>
+        <data-mapper:transform config-ref="Map_To_XML" doc:name="Map To XML"/>
+        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
+        <logger message="XXXXXXXXXXXXXXXXXXX  #[payload]" level="INFO" doc:name="Logger"/>
+        <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_HRMASTER_SAVE_REPL_MULT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP" bapiTransaction="true" evaluateFunctionResponse="true"/>
+        <logger level="INFO" doc:name="Logger" message="XXXXXXXXXXXXXXXXXXX  sap response #[payload]"/>
     
     </sub-flow>
     <sub-flow name="queryWorkdayEmployeeSubflow" doc:name="queryWorkdayEmployeeSubflow">
-        <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="Workday Human Resource"/>
+        <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="Workday Human Resource"/>
+        <set-payload value="#[payload.getEmployeeData().get(0).getEmployeeID()]" doc:name="Set Payload"/>
     </sub-flow>
 
 </mule>

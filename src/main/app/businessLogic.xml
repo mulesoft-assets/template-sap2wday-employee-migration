@@ -29,7 +29,7 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
                 <expression-component doc:name="Expression"><![CDATA[System.err.println("test");
 //payload.put("PersonalNumber","90000035");]]></expression-component>
                 <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
-                    <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'])]" doc:name="query Workday for existing employee"/>
+                    <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="query Workday for existing employee"/>
                 </enricher>
                 <logger message="XXXX existing worker #[recordVars['existingWorker']]" level="INFO" doc:name="Logger"/>
             </batch:step>
@@ -61,6 +61,7 @@ payload.put("Id", payload.get('PersonalNumber'));
                         <data-mapper:input-argument key="organization">${wday.organization}</data-mapper:input-argument>
                         <data-mapper:input-argument key="jobprofile">${wday.jobprofileId}</data-mapper:input-argument>
                         <data-mapper:input-argument key="currency">${wday.currency}</data-mapper:input-argument>
+                        <data-mapper:input-argument key="systemId">${wday.system.id}</data-mapper:input-argument>
                     </data-mapper:input-arguments>
                 </data-mapper:transform>
 

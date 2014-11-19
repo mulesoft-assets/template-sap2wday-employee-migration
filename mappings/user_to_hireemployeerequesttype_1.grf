@@ -4151,6 +4151,7 @@
 <Dictionary>
 <Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
 <Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+<Entry dictval.__javaType="java.lang.String" id="DictionaryEntry10" input="true" name="systemId" output="false" type="string"/>
 <Entry dictval.__javaType="java.lang.String" id="DictionaryEntry2" input="true" name="country" output="false" type="string"/>
 <Entry dictval.__javaType="java.lang.String" id="DictionaryEntry3" input="true" name="city" output="false" type="string"/>
 <Entry dictval.__javaType="java.lang.String" id="DictionaryEntry4" input="true" name="postalCode" output="false" type="string"/>
@@ -7628,7 +7629,7 @@ output.__id = input.__id;
 output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.externalID = input.Id;
-output.systemID = "Salesforce - Chatter";]]></attr>
+output.systemID = inputArguments.systemId;]]></attr>
 </Node>
 <Node enabled="enabled" guiName="Foreach 'User' -&gt; 'externalID'" guiX="460" guiY="3020" id="FOREACH_USER_EXTERNAL_ID1" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
 <attr name="melScript"><![CDATA[//MEL
@@ -7637,7 +7638,7 @@ output.__id = input.__id;
 output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.externalID = input.Id;
-output.systemID = "Salesforce - Chatter";]]></attr>
+output.systemID = inputArguments.systemId;]]></attr>
 </Node>
 <Node enabled="enabled" guiName="Foreach 'User' -&gt; 'ID'" guiX="460" guiY="120" id="FOREACH_USER_ID" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
 <attr name="melScript"><![CDATA[//MEL

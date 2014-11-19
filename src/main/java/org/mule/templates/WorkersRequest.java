@@ -16,7 +16,7 @@ import com.workday.hr.IDType;
 
 public class WorkersRequest {
 	
-	public static EmployeeGetType createEmployeeRequest(String value) throws Exception{
+	public static EmployeeGetType createEmployeeRequest(String value, String systemId) throws Exception{
 		final GregorianCalendar gcalendar = new GregorianCalendar();
 		gcalendar.setTime(new Date());
 
@@ -25,7 +25,7 @@ public class WorkersRequest {
 		final ExternalIntegrationIDReferenceDataType extIdReference = new ExternalIntegrationIDReferenceDataType();
 		
 		final IDType idType = new IDType();
-		idType.setSystemID("Salesforce - Chatter");
+		idType.setSystemID(systemId);
 		idType.setValue(value);
 		
 		extIdReference.setID(idType);
