@@ -79,8 +79,8 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 		try {
 			Map<String, Object> employee = new HashMap<String, Object>();
 			long prefix = System.currentTimeMillis();
-			employee.put("FirstName", "Smi"+prefix);
-			employee.put("LastName", "Smi"+prefix);
+			employee.put("FirstName", "Amy");
+			employee.put("LastName", "Adams"+prefix);
 			Object response = createSapEmployeeSubflow.process(getTestEvent(employee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
 			System.err.println("createTestDataInSandBox" + response.getClass());
 			System.err.println("createTestDataInSandBox " + response);

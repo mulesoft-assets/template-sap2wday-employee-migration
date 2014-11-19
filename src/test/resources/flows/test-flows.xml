@@ -11,13 +11,30 @@ http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schem
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
     <data-mapper:config name="Map_To_XML" transformationGraphPath="map_to_xml.grf" doc:name="Map_To_XML"/>
+    <data-mapper:config name="XML_To_Map_1" transformationGraphPath="xml_to_map_1.grf" doc:name="XML_To_Map"/>
     <sub-flow name="createSapEmployeeSubflow" doc:name="createSapEmployeeSubflow">
         <logger message="yyyyyy before upsert #[payload]" level="INFO" doc:name="Logger"/>
+        <enricher source="#[payload['EmployeeNumber']]" target="#[flowVars['EmployeeNumber']]" doc:name="Message Enricher">
+            <processor-chain doc:name="Processor Chain">
+                <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="ZMULE_NUMBER_GET_NEXT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="get next Employee Number">
+                    <sap:definition><![CDATA[<jco>
+  	<import>	
+		<field name="NR_RANGE_NR">03</field>
+		<field name="OBJECT">RP_PREL</field>      
+	</import>
+</jco>]]></sap:definition>
+                </sap:outbound-endpoint>
+                <data-mapper:transform config-ref="XML_To_Map_1" doc:name="XML To Map"/>
+                <logger message="XXXXXX next number #[payload]" level="INFO" doc:name="Logger"/>
+            </processor-chain>
+        </enricher>
+        <expression-component doc:name="Expression"><![CDATA[payload.put("EmployeeNumber", flowVars['EmployeeNumber']);]]></expression-component>
         <data-mapper:transform config-ref="Map_To_XML" doc:name="Map To XML"/>
         <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <logger message="XXXXXXXXXXXXXXXXXXX  #[payload]" level="INFO" doc:name="Logger"/>
         <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_HRMASTER_SAVE_REPL_MULT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP" bapiTransaction="true" evaluateFunctionResponse="true"/>
         <logger level="INFO" doc:name="Logger" message="XXXXXXXXXXXXXXXXXXX  sap response #[payload]"/>
+        <set-payload value="#[flowVars['EmployeeNumber']]" doc:name="Set Payload"/>
     
     </sub-flow>
     <sub-flow name="queryWorkdayEmployeeSubflow" doc:name="queryWorkdayEmployeeSubflow">

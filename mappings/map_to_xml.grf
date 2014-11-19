@@ -11,7 +11,7 @@
 <Field __index="0" __sourcePath="{}/Employee/FirstName" containerType="SINGLE" label="FirstName" name="FirstName" type="string"/>
 <Field __index="1" __sourcePath="{}/Employee/LastName" containerType="SINGLE" label="LastName" name="LastName" type="string"/>
 <Field __index="2" __sourcePath="{}/Employee/Title" containerType="SINGLE" label="Title" name="Title" type="string"/>
-<Field __sourcePath="{}/Employee/PlanVersion" containerType="SINGLE" label="PlanVersion" name="PlanVersion" type="string"/>
+<Field __sourcePath="{}/Employee/EmployeeNumber" containerType="SINGLE" label="EmployeeNumber" name="EmployeeNumber" type="string"/>
 </Record>
 </Metadata>
 <Metadata __index="0" __referenceCounter="0" __sourcePath="{}/BAPI_HRMASTER_SAVE_REPL_MULT/tables/EMPLOYEE_ARCHIVED_OBJECTS/row" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _metadataParentId="459aefee-a68d-40cc-b307-ec7c67e00ac7" _parent_id="__parent_id" _type="Output" id="46201fa2-6e41-4199-a158-cb8440f86886">
@@ -3189,7 +3189,7 @@
   <Mapping cloverField="FirstName" trim="true" xpath="FirstName"/>
   <Mapping cloverField="LastName" trim="true" xpath="LastName"/>
   <Mapping cloverField="Title" trim="true" xpath="Title"/>
-  <Mapping cloverField="PlanVersion" trim="true" xpath="PlanVersion"/>
+  <Mapping cloverField="EmployeeNumber" trim="true" xpath="EmployeeNumber"/>
 </Context>
 ]]></attr>
 <attr name="_data_format"><![CDATA[MAP]]></attr>
@@ -3473,7 +3473,7 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.PLAN_VER = "01";
 output.OBJ_TYPE = "P";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.OPERATOR = "I";]]></attr>
 </Node>
 <Node enabled="enabled" guiName="hr_infotype 1" guiX="460" guiY="220" id="FOREACH_EMPLOYEE_ROW1" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
@@ -3484,7 +3484,7 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.PLAN_VER = "01";
 output.OBJ_TYPE = "P";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0000";
 output.FROM_DATE = "20141118";
 output.TO_DATE = "99991231";]]></attr>
@@ -3495,7 +3495,7 @@ output.TO_DATE = "99991231";]]></attr>
 output.__id = input.__id;
 output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0001";
 output.TO_DATE = "99991231";
 output.FROM_DATE = "20141118";
@@ -3518,7 +3518,7 @@ output.OBJ_TYPE = "S";]]></attr>
 output.__id = input.__id;
 output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0003";
 output.TO_DATE = "99991231";
 output.FROM_DATE = "18000101";
@@ -3535,7 +3535,7 @@ output.EARLIEST_PAYROLL_MD_CHANGE = "20141118";]]></attr>
 output.__id = input.__id;
 output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0000";
 output.TO_DATE = "99991231";
 output.FROM_DATE = "20141118";
@@ -3551,14 +3551,14 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.TITLE = input.Title;
 output.INFOTYPE = "0002";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.TO_DATE = "99991231";
 output.FROM_DATE = "20141118";
-output.LAST_NAME = "Adams";
+output.LAST_NAME = input.LastName;
 output.SECOND_NAME = "Mc";
-output.FIRST_NAME = "Adams";
-output.FULL_EMPLOYEE_NAME = "Amy Adams";
-output.KNOWN_AS = "Amy";
+output.FIRST_NAME = input.FirstName;
+output.FULL_EMPLOYEE_NAME = input.FirstName + " " + input.LastName;;
+output.KNOWN_AS = input.FirstName;
 output.MIDDLE_NAME = "Mc";
 output.NAME_FORMAT_INDICATOR = "0";
 output.FORM_OF_ADDRESS_KEY = "1";
@@ -3576,8 +3576,8 @@ output.PERSIDNO = "547547574";
 output.YEAR_OF_BIRTH = "1980";
 output.MONTH_OF_BIRTH = "01";
 output.DAY_OF_BIRTH = "01";
-output.LAST_NAME_MATCHCODE = "Adams";
-output.FIRST_NAME_MATCHCODE = "Amy";]]></attr>
+output.LAST_NAME_MATCHCODE = input.LastName;
+output.FIRST_NAME_MATCHCODE = input.FirstName;]]></attr>
 </Node>
 <Node enabled="enabled" guiName="hr_infotype 2" guiX="460" guiY="720" id="FOREACH_EMPLOYEE_ROW6" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
 <attr name="melScript"><![CDATA[//MEL
@@ -3587,7 +3587,7 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.PLAN_VER = "01";
 output.OBJ_TYPE = "P";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0001";
 output.FROM_DATE = "20141118";
 output.TO_DATE = "99991231";]]></attr>
@@ -3600,7 +3600,7 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.PLAN_VER = "01";
 output.OBJ_TYPE = "P";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0002";
 output.FROM_DATE = "20141118";
 output.TO_DATE = "99991231";]]></attr>
@@ -3613,7 +3613,7 @@ output.__parent_id = input.__id;
 //END -> DO NOT REMOVE
 output.PLAN_VER = "01";
 output.OBJ_TYPE = "P";
-output.OBJ_ID = "00089027";
+output.OBJ_ID = input.EmployeeNumber;
 output.INFOTYPE = "0003";
 output.FROM_DATE = "20141118";
 output.TO_DATE = "99991231";]]></attr>
