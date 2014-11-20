@@ -3569,15 +3569,18 @@ output.STATE = "NJ";
 output.BIRTHPLACE = "Parsippany";
 output.NATIONALITY = "US";
 output.THIRD_NATIONALITY = "US";
-output.LANGU = "";
+output.LANGU = "EN";
 output.NUMBER_OF_CHILDREN = "1";
 output.MODIFIER_FOR_PERSONNEL_ID = "10";
 output.PERSIDNO = "547547574";
 output.YEAR_OF_BIRTH = "1980";
 output.MONTH_OF_BIRTH = "01";
 output.DAY_OF_BIRTH = "01";
-output.LAST_NAME_MATCHCODE = input.LastName;
-output.FIRST_NAME_MATCHCODE = input.FirstName;]]></attr>
+output.LAST_NAME_MATCHCODE = input.LastName.toUpperCase();
+output.FIRST_NAME_MATCHCODE = input.FirstName.toUpperCase();
+output.SUBTYPE = "";;
+output.OBJECT_IDENTIFICATION = "";;
+output.LOCKINDIC = "";;]]></attr>
 </Node>
 <Node enabled="enabled" guiName="hr_infotype 2" guiX="460" guiY="720" id="FOREACH_EMPLOYEE_ROW6" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
 <attr name="melScript"><![CDATA[//MEL

@@ -19,7 +19,7 @@ Here you should not:
         <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_EMPLOYEE_GETDATA" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="query SAP for Employees">
             <sap:definition><![CDATA[<jco>
   	<import>	
-		<field name="LASTNAME_M">*Adams*</field>   
+		<field name="FSTNAME_M">*AMY*</field>   
 	</import>
 </jco>]]></sap:definition>
         </sap:outbound-endpoint>
