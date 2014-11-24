@@ -40,6 +40,7 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
     <sub-flow name="queryWorkdayEmployeeSubflow" doc:name="queryWorkdayEmployeeSubflow">
         <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="Workday Human Resource"/>
         <set-payload value="#[payload.getEmployeeData().get(0).getEmployeeID()]" doc:name="Set Payload"/>
+        <logger message="workday response #[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
 
 </mule>

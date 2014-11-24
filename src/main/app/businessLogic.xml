@@ -17,7 +17,7 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
     <data-mapper:config name="XML_To_Map" transformationGraphPath="xml_to_map.grf" doc:name="XML_To_Map"/>
     <data-mapper:config name="Map_To_ChangePreferredNameRequestType" transformationGraphPath="map_to_changepreferrednamerequesttype.grf" doc:name="Map_To_ChangePreferredNameRequestType"/>
 	<data-mapper:config name="User_To_HireEmployeeRequestType_1" transformationGraphPath="user_to_hireemployeerequesttype_1.grf" doc:name="User_To_HireEmployeeRequestType_1"/>
-    <batch:job name="businessLogicBatch1" max-failed-records="9999">
+    <batch:job name="businessLogicBatch1" max-failed-records="-1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
         <batch:input>
             <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>

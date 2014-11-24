@@ -25,6 +25,7 @@ public class WorkersRequest {
 		final ExternalIntegrationIDReferenceDataType extIdReference = new ExternalIntegrationIDReferenceDataType();
 		
 		final IDType idType = new IDType();
+		System.err.println("employee request " + systemId + " " + value);
 		idType.setSystemID(systemId);
 		idType.setValue(value);
 		
