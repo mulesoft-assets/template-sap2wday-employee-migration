@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mule.templates</groupId>
 		<artifactId>templates-tooling-parent-pom</artifactId>
-		<version>1.0.7</version>
+		<version>1.0.8</version>
 	</parent>
 
 	<artifactId>template-sap2wday-employee-migration</artifactId>
@@ -17,6 +17,9 @@
 	<properties>
 		<workday.version>3.0.0</workday.version>
 		<sfdc.version>5.4.8</sfdc.version>
+		<sap.jco.version>3.0.10</sap.jco.version>
+		<sap.idoc.version>3.0.10</sap.idoc.version>
+		<sap.build.type>linux64</sap.build.type>
 	</properties>
 
 	<build>
@@ -34,6 +37,54 @@
                     </inclusions>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.sap.conn.jco</groupId>
+									<artifactId>sapjco-native</artifactId>
+									<version>${sap.jco.version}</version>
+									<classifier>${sap.build.type}</classifier>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/temp-native-lib</outputDirectory>
+									<includes>**/*.dll,**/*.so,**/*.jnilib</includes>
+									<excludes>META-INF</excludes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-native-lib</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<zip destfile="${project.build.directory}/${project.build.finalName}.zip" update="true">
+									<zipfileset dir="${project.build.directory}/temp-native-lib" prefix="lib" />
+								</zip>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -47,6 +98,25 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-sfdc</artifactId>
 			<version>${sfdc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.conn.jco</groupId>
+			<artifactId>sapjco3</artifactId>
+			<version>${sap.jco.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.conn.jco</groupId>
+			<artifactId>sapjco-native</artifactId>
+			<version>${sap.jco.version}</version>
+			<classifier>${sap.build.type}</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.conn.idoc</groupId>
+			<artifactId>sapidoc3</artifactId>
+			<version>${sap.idoc.version}</version>
+			<scope>test</scope>
 		</dependency>
 	<dependency>
             <groupId>org.mule.modules</groupId>
@@ -63,7 +133,7 @@
     <dependency>
             <groupId>com.mulesoft.muleesb.transports</groupId>
             <artifactId>mule-transport-sap</artifactId>
-            <version>2.2.3</version>
+            <version>${sap.version}</version>
         </dependency>
     <dependency>
             <groupId>com.mulesoft.muleesb.modules</groupId>
@@ -91,6 +161,12 @@
             <name>Mule Release Repository</name>
             <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-releases/</url>
         </repository>
+		<repository>
+			<id>mule-ee-thirdparty</id>
+			<name>MuleSoft Thirdparty Repository</name>
+			<url>https://repository.mulesoft.org/nexus/content/repositories/thirdparty/</url>
+			<layout>default</layout>
+		</repository>
     </repositories>	
 	<scm>
 		<connection>scm:git:https://github.com/mulesoft/template-sap2wday-employee-migration.git</connection>

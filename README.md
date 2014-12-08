@@ -1,5 +1,5 @@
 
-# Anypoint Template: Sap to Workday Worker Migration
+# Anypoint Template: Sap to Workday Employee Migration
 
 + [License Agreement](#licenseagreement)
 + [Use Case](#usecase)
@@ -26,9 +26,9 @@ Note that using this template is subject to the conditions of this [License Agre
 Please review the terms of the license before downloading and using this template. In short, you are allowed to use the template for free with Mule ESB Enterprise Edition, CloudHub, or as a trial in Anypoint Studio.
 
 # Use Case <a name="usecase"/>
-As a SAP admin I want to migrate workers to Workday.
+As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint Template should serve as a foundation for the process of migrating Worker from SAP instance to Workday ,being able to specify available filtering criterias and desired behaviour when a user already exists in the destination system. 
+This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday ,being able to specify available filtering criterias and desired behaviour when a user already exists in the destination system. 
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
@@ -64,7 +64,7 @@ The connector can either use RFC calls of BAPI functions and/or IDoc messages fo
 There are no particular considerations for this Anypoint Template regarding Workday as data destination.
 
 # Run it! <a name="runit"/>
-Simple steps to get Sap to Workday Worker Migration running.
+Simple steps to get Sap to Workday Employee Migration running.
 In any of the ways you would like to run this Anypoint Template this is an example of the output you'll see after hitting the HTTP endpoint:
 
 <pre>
@@ -197,7 +197,7 @@ This Anypoint Template has only an [HTTP Inbound Endpoint](http://www.mulesoft.o
 + `${http.port}` is set as a property to be defined either on a property file or in CloudHub environment variables.
 + The path configured by default is `migrateemployees` and you are free to change for the one you prefer.
 + The host name for all endpoints in your CloudHub configuration should be defined as `localhost`. CloudHub will then route requests from your application domain URL to the endpoint.
-+ The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Workers migrated and filtered by the criteria specified.
++ The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Employees migrated and filtered by the criteria specified.
 
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -17,12 +17,12 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
         <enricher source="#[payload['EmployeeNumber']]" target="#[flowVars['EmployeeNumber']]" doc:name="Message Enricher">
             <processor-chain doc:name="Processor Chain">
                 <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="ZMULE_NUMBER_GET_NEXT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="get next Employee Number">
-                    <sap:definition><![CDATA[<jco>
+                    <sap:definition><![CDATA[<ZMULE_NUMBER_GET_NEXT>
   	<import>	
-		<field name="NR_RANGE_NR">03</field>
-		<field name="OBJECT">RP_PREL</field>      
+		<NR_RANGE_NR>03</NR_RANGE_NR>
+		<OBJECT>RP_PREL</OBJECT>      
 	</import>
-</jco>]]></sap:definition>
+</ZMULE_NUMBER_GET_NEXT>]]></sap:definition>
 
                 </sap:outbound-endpoint>
                 <data-mapper:transform config-ref="XML_To_Map_1" doc:name="XML To Map"/>

@@ -17,11 +17,11 @@ Here you should not:
 	* Choose flow of your application based on input parameters">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" path="migrateemplyees" doc:name="start sync"/>
         <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_EMPLOYEE_GETDATA" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="query SAP for Employees">
-            <sap:definition><![CDATA[<jco>
+            <sap:definition><![CDATA[<BAPI_EMPLOYEE_GETDATA>
   	<import>	
-		<field name="LASTNAME_M">*ADAMS1*</field>   
+		<LASTNAME_M>*ADAMS1*</LASTNAME_M>   
 	</import>
-</jco>]]></sap:definition>
+</BAPI_EMPLOYEE_GETDATA>]]></sap:definition>
         </sap:outbound-endpoint>
 
         <logger message="3333333333333 #[payload]" level="INFO" doc:name="Logger"/>

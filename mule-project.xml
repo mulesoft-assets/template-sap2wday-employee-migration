@@ -2,7 +2,4 @@
 <mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.5.2.ee" schemaVersion="3.5.0.0">
     <name>template-sap2wday-employee-migration</name>
     <description></description>
-    <muleExtension name="SAP" qualifier="org.mule.tooling.ui.contribution.sap.3.5.0"/>
-    <muleExtension name="Workday Staffing" qualifier="org.mule.tooling.ui.contribution.wd-staffing"/>
-    <muleExtension name="Workday Human Resource" qualifier="org.mule.tooling.ui.contribution.wd-hr"/>
 </mule-project>
