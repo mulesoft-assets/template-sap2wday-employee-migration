@@ -7,13 +7,13 @@
 		<section id="use_case">
 As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday ,being able to specify available filtering criteria and desired behaviour when a user already exists in the destination system. 
+This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behaviour when a user already exists in the destination system. 
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
 During the Input stage the Anypoint Template will go to the SAP and query all the employees that match the filter criteria. The criteria is based on available filtering fields for standard BAPI BAPI_EMPLOYEE_GETDATA.
 The last step of the Process stage will group the employees and create them in Workday using HIRE_EMPLOYEE function call.
-Finally during the On Complete stage the Anypoint Template will both output statistics data into the console and send a notification email with the results of the batch excecution. 
+Finally during the On Complete stage the Anypoint Template will both output statistics data into the console and send a notification email with the results of the batch execution. 
 		</section>
 		<section id="considerations">
 <![CDATA[
@@ -23,7 +23,6 @@ There are a couple of things you should take into account before running this An
 		</section>
 		<section id="run_it">
 <![CDATA[
-
 In any of the ways you would like to run this Anypoint Template this is an example of the output you'll see after hitting the HTTP endpoint:
 
 <pre>
@@ -52,7 +51,7 @@ After this, to trigger the use case you just need to hit the local http endpoint
 + wday.user `user`
 + wday.password `secret`
 + wday.endpoint `https://impl-cc.workday.com/...`
-+ wday.integration.user.id `487854151`
+
 + wday.jobprofileId `39905`
 + wday.country `USA`
 + wday.state `USA-CA`
@@ -61,7 +60,9 @@ After this, to trigger the use case you just need to hit the local http endpoint
 + wday.city `San Francisco`
 + wday.location `San_Francisco_Site`
 + wday.currency `USD`
-+ wday.testuser.id `24760`
++ wday.address `New York`
++ wday.system.id `System id`
++ wday.email `john.doe@aol.com`
 
 #### SAP Connector configuration
 + sap.jco.ashost `example.domain.com`
@@ -93,6 +94,8 @@ After this, to trigger the use case you just need to hit the local http endpoint
 		<![CDATA[
 This is the file where you will found the inbound and outbound sides of your integration app.
 This Anypoint Template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
+This flow has Exception Strategy that basically consists on invoking the *defaultChoiseExceptionStrategy* defined in *errorHandling.xml* file.
+For the pourpose of this particular Anypoint Template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
 
 $H$H#  Inbound Flow
 **HTTP Inbound Endpoint** - Start Report Generation
@@ -104,9 +107,14 @@ $H$H#  Inbound Flow
 		</section>
 		<section id="default_business_logic_xml">
 		<![CDATA[
-Functional aspect of the Anypoint Template is implemented on this XML, directed by one flow responsible of excecuting the logic.
-For the pourpose of this particular Anypoint Template the *mainFlow* just executes the Batch Job which handles all the logic of it.
-This flow has Exception Strategy that basically consists on invoking the *defaultChoiseExceptionStrategy* defined in *errorHandling.xml* file.
+Functional aspect of the Anypoint Template is implemented on this XML, directed by a batch job that will be responsible for creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
+
+1. Job execution is invoked from triggerFlow (endpoints.xml).
+2. During the Process stage, each Employee will be filtered depending on, if it has an existing matching Employee in the Workday instance. The matching is performed by querying a Workday instance for an entry with the given External Reference ID.
+3. The next step will insert a new record into the Workday instance if there was none found in the previous step.
+4. The final step will update a Workday employee.
+
+Finally during the On Complete stage the Anypoint Template will logoutput statistics data into the console.
 ]]>
 		</section>
 	</sections>
