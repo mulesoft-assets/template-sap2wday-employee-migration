@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,19 +66,22 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 
 	@Test
 	public void testMainFlow() throws Exception {
-		Thread.sleep(20000);
+		Thread.sleep(30000);
+		
 		runFlow("triggerFlow");
+		
+		Thread.sleep(1000*60*6);
 
-		// Wait for the batch job executed by the poll flow to finish
-		helper.awaitJobTermination(TIMEOUT_SEC * 1000, 500);
-		//helper.assertJobWasSuccessful();
-
-		System.err.println("querying workday with employee " + createdEmployee);
+		createdEmployee.put("PersonalNumber", createdEmployee.get("PersonalNumber"));
+		createdEmployee.put("EmployeeNumber", createdEmployee.get("EmployeeNumber"));
+		// Find migrated employee by ID
 		Object response = queryWorkdayEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
-		System.err.println("queryWorkdayEmployeeSubflow " + response.getClass());
-		System.err.println("queryWorkdayEmployeeSubflow " + response);
+		Assert.assertNotNull(response);
 	}
 
+	/*
+	 * Creates employee in Workday suitable for a migration.
+	 */
 	private void createTestDataInSandBox() throws MuleException, Exception {
 		try {
 			Map<String, Object> employee = new HashMap<String, Object>();

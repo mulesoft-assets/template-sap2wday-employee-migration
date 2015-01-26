@@ -24,6 +24,7 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
 	</import>
 </ZMULE_NUMBER_GET_NEXT>]]></sap:definition>
 
+
                 </sap:outbound-endpoint>
                 <data-mapper:transform config-ref="XML_To_Map_1" doc:name="XML To Map"/>
                 <logger message="XXXXXX next number #[payload]" level="INFO" doc:name="Logger"/>

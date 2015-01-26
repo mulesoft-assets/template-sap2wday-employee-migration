@@ -19,11 +19,12 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
 	<data-mapper:config name="User_To_HireEmployeeRequestType_1" transformationGraphPath="user_to_hireemployeerequesttype_1.grf" doc:name="User_To_HireEmployeeRequestType_1"/>
     <batch:job name="businessLogicBatch1" max-failed-records="-1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
-        <batch:input>
-            <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
-            <logger message="XXXX #[payload]" level="INFO" doc:name="Logger"/>
-        </batch:input>
+
         <batch:process-records>
+            <batch:step name="CreateEmployee">
+                <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
+                <logger message="XXXX #[payload]" level="INFO" doc:name="Logger"/>
+            </batch:step>
             <batch:step name="getUserInWdayStep" accept-policy="ALL">
                 <logger message="XXXX EXISTING USER  #[payload]" level="INFO" doc:name="Logger"/>
                 <expression-component doc:name="Expression"><![CDATA[System.err.println("test");

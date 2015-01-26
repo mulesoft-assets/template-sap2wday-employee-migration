@@ -14,6 +14,10 @@ import com.workday.hr.EmployeeReferenceType;
 import com.workday.hr.ExternalIntegrationIDReferenceDataType;
 import com.workday.hr.IDType;
 
+/**
+ * Represents the workday request for employee by external reference ID.
+ * @author Vlado Andoga
+ */
 public class WorkersRequest {
 	
 	public static EmployeeGetType createEmployeeRequest(String value, String systemId) throws Exception{
@@ -25,7 +29,6 @@ public class WorkersRequest {
 		final ExternalIntegrationIDReferenceDataType extIdReference = new ExternalIntegrationIDReferenceDataType();
 		
 		final IDType idType = new IDType();
-		System.err.println("employee request " + systemId + " " + value);
 		idType.setSystemID(systemId);
 		idType.setValue(value);
 		
