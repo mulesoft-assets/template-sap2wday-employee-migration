@@ -28,7 +28,7 @@ Please review the terms of the license before downloading and using this templat
 # Use Case <a name="usecase"/>
 As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behaviour when a user already exists in the destination system. 
+This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behaviour when an employee already exists in the destination system. 
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
