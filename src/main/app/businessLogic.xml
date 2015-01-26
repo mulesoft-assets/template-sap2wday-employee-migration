@@ -17,41 +17,30 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
     <data-mapper:config name="XML_To_Map" transformationGraphPath="xml_to_map.grf" doc:name="XML_To_Map"/>
     <data-mapper:config name="Map_To_ChangePreferredNameRequestType" transformationGraphPath="map_to_changepreferrednamerequesttype.grf" doc:name="Map_To_ChangePreferredNameRequestType"/>
 	<data-mapper:config name="User_To_HireEmployeeRequestType_1" transformationGraphPath="user_to_hireemployeerequesttype_1.grf" doc:name="User_To_HireEmployeeRequestType_1"/>
-    <batch:job name="businessLogicBatch1" max-failed-records="-1">
+    <batch:job name="businessLogicBatch" max-failed-records="-1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
+        <batch:input>
+            <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
+        </batch:input>
 
         <batch:process-records>
-            <batch:step name="CreateEmployee">
-                <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
-                <logger message="XXXX #[payload]" level="INFO" doc:name="Logger"/>
-            </batch:step>
+
             <batch:step name="getUserInWdayStep" accept-policy="ALL">
-                <logger message="XXXX EXISTING USER  #[payload]" level="INFO" doc:name="Logger"/>
-                <expression-component doc:name="Expression"><![CDATA[System.err.println("test");
-//payload.put("PersonalNumber","90000035");]]></expression-component>
+
                 <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
                     <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="query Workday for existing employee"/>
                 </enricher>
-                <logger message="XXXX existing worker #[recordVars['existingWorker']]" level="INFO" doc:name="Logger"/>
+
             </batch:step>
             <batch:step name="insertWorkerStep" accept-expression="recordVars['existingWorker'] == null" accept-policy="ALL">
 
-                <expression-component doc:name="prepare for insert"><![CDATA[//payload.put("Country", "${wday.country}");
-//payload.put("State", "${wday.state}");
-//payload.put("Organization", "${wday.organization}");
-//payload.put("JobprofileId", "${wday.jobprofileId}");
-//payload.put("PostalCode", "${wday.postalCode}");
-//payload.put("City", "${wday.city}");
-//payload.put("Location", "${wday.location}");
-//payload.put("Currency", "${wday.currency}");
-
-payload.put("Address", "New York");
-payload.put("Email", "john.doe@aol.com");
+                <expression-component doc:name="prepare for insert"><![CDATA[payload.put("Address","${wday.address}");
+payload.put("Email", "${wday.email}");
 payload.put("Id", payload.get('PersonalNumber'));
 
 
 ]]></expression-component>
-                <logger message="XXXX before insert step #[payload] " level="INFO" doc:name="Logger"/>
+
                 <data-mapper:transform config-ref="User_To_HireEmployeeRequestType_1" doc:name="User To HireEmployeeRequestType">
                     <data-mapper:input-arguments>
                         <data-mapper:input-argument key="country">${wday.country}</data-mapper:input-argument>
@@ -67,16 +56,16 @@ payload.put("Id", payload.get('PersonalNumber'));
                 </data-mapper:transform>
 
                 <wd-staffing:hire-employee config-ref="Workday_Staffing" doc:name="create Workday employee"/>
-                <logger message="XXXX insert result #[payload.employeeReference.getID().get(1).getValue()]" level="INFO" doc:name="Logger"/>
+
             </batch:step>
             <batch:step name="updateWorkerStep" accept-expression="recordVars['existingWorker'] != null" accept-policy="ALL">
 
                 <expression-component doc:name="prepare for update"><![CDATA[payload.put("Country", "${wday.country}");
 payload.put("Id", recordVars['existingWorker']);]]></expression-component>
-                <logger message="XXXX update step #[payload]  existing #[recordVars['existingWorker']]" level="INFO" doc:name="Logger"/>
+
                 <data-mapper:transform config-ref="Map_To_ChangePreferredNameRequestType" doc:name="Map to EmployeeGetType"/>
                 <wd-hr:change-preferred-name config-ref="Workday_Human_Resource" doc:name="update Workday employee"/>
-                <logger message="XXXX update result #[payload]" level="INFO" doc:name="log result"/>
+
             </batch:step>
         </batch:process-records>
         <batch:on-complete>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="Marek" created="Thu Nov 06 09:42:24 CET 2014" description="XML To Map" guiVersion="3.4.4.P" id="1415263921829" licenseCode="Unlicensed" licenseType="Unknown" modified="Thu Nov 06 09:42:24 CET 2014" modifiedBy="Marek" name="XML_To_Map" revision="1.0" showComponentDetails="false">
 <Global>
-<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="f2b83b3e-6dc1-49fa-8e44-e4744d7ac297">
+<Metadata __index="0" __referenceCounter="2" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _type="Output" id="f2b83b3e-6dc1-49fa-8e44-e4744d7ac297">
 <Record fieldDelimiter="," name="BAPI_EMPLOYEE_GETDATA" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
 <Field __index="0" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/FirstName" containerType="SINGLE" label="FirstName" name="FirstName" type="string"/>
@@ -8,7 +8,6 @@
 <Field __index="1" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/LastName" containerType="SINGLE" label="LastName" name="LastName" type="string"/>
 <Field __index="2" __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/Title" containerType="SINGLE" label="Title" name="Title" type="string"/>
 <Field __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/PersonalNumber" containerType="SINGLE" label="PersonalNumber" name="PersonalNumber" type="string"/>
-<Field __sourcePath="{}/BAPI_x005fEMPLOYEE_x005fGETDATA/Email" containerType="SINGLE" label="Email" name="Email" type="string"/>
 </Record>
 </Metadata>
 <Metadata __filteredMetadata="true" __index="0" __referenceCounter="1" __sourcePath="{}/BAPI_EMPLOYEE_GETDATA" _dataStructure="OBJECT" _id="__id" _type="Input" id="d3a325dd-7031-4f9d-bafb-d18fdfa4edb5">
@@ -54,7 +53,7 @@
 <Field __index="25" __sourcePath="{}/BAPI_EMPLOYEE_GETDATA/tables/COMMUNICATION/row/@id" containerType="SINGLE" label="id" name="id" type="integer"/>
 </Record>
 </Metadata>
-<Metadata __index="26" __referenceCounter="0" __sourcePath="{}/BAPI_EMPLOYEE_GETDATA/tables/PERSONAL_DATA/row" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _metadataParentId="d3a325dd-7031-4f9d-bafb-d18fdfa4edb5" _parent_id="__parent_id" _type="Input" id="f5d2c3ed-5174-4fa2-8f3e-6bf92728595e">
+<Metadata __index="26" __referenceCounter="1" __sourcePath="{}/BAPI_EMPLOYEE_GETDATA/tables/PERSONAL_DATA/row" _dataStructure="SINGLE_DIMENSIONAL_COLLECTION" _id="__id" _metadataParentId="d3a325dd-7031-4f9d-bafb-d18fdfa4edb5" _parent_id="__parent_id" _type="Input" id="f5d2c3ed-5174-4fa2-8f3e-6bf92728595e">
 <Record fieldDelimiter="," name="row" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
 <Field __artificialType="_parent_id" __systemManaged="true" name="__parent_id" type="string"/>
 <Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
@@ -136,12 +135,18 @@
 //START -> DO NOT REMOVE
 output.__id = input.__id;
 //END -> DO NOT REMOVE
-output.PersonalNumber = input.PersonalNumber_rule;
-output.LastName = input.LastName_rule;
-output.Gender = input.Gender_rule;
-output.Title = input.Title_rule;
-output.Email = input.Email_rule;
-output.FirstName = input.FirstName_rule;]]></attr>
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Foreach 'row' -&gt; 'BAPI_x005fEMPLOYEE_x005fGETDATA'" guiX="460" guiY="120" id="FOREACH_ROW_BAPI_X005F_EMPLOYEE_X005F_GETDATA" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = input.__id;
+//END -> DO NOT REMOVE
+output.FirstName = input.FIRSTNAME;
+output.Title = input.TITLE;
+output.Gender = input.GENDER;
+output.PersonalNumber = input.PERNO;
+output.LastName = input.LAST_NAME;]]></attr>
 </Node>
 <Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
@@ -152,7 +157,13 @@ output.FirstName = input.FirstName_rule;]]></attr>
     <Title>$0.Title</Title>
     <Gender>$0.Gender</Gender>
     <PersonalNumber>$0.PersonalNumber</PersonalNumber>
-    <Email>$0.Email</Email>
+  </item>
+  <item clover:inPort="1">
+    <FirstName>$1.FirstName</FirstName>
+    <LastName>$1.LastName</LastName>
+    <Title>$1.Title</Title>
+    <Gender>$1.Gender</Gender>
+    <PersonalNumber>$1.PersonalNumber</PersonalNumber>
   </item>
 </clover:collection>]]></attr>
 <attr name="_data_format"><![CDATA[MAP]]></attr>
@@ -167,12 +178,81 @@ output.FirstName = input.FirstName_rule;]]></attr>
   <Mapping cloverField="Gender_rule" trim="true" xpath="tables/PERSONAL_DATA/row[1]/GENDER"/>
   <Mapping cloverField="Title_rule" trim="true" xpath="tables/PERSONAL_DATA/row[1]/TITLE"/>
   <Mapping cloverField="Email_rule" trim="true" xpath="tables/COMMUNICATION/row[1]/USERID"/>
+  <Context generatedKey="__parent_id" outPort="1" parentKey="__id" sequenceField="__id" xpath="tables/PERSONAL_DATA/row">
+    <Mapping cloverField="PERNO" trim="true" xpath="PERNO"/>
+    <Mapping cloverField="INFOTYPE" trim="true" xpath="INFOTYPE"/>
+    <Mapping cloverField="SUBTYPE" trim="true" xpath="SUBTYPE"/>
+    <Mapping cloverField="OBJECT_ID" trim="true" xpath="OBJECT_ID"/>
+    <Mapping cloverField="LOCK_IND" trim="true" xpath="LOCK_IND"/>
+    <Mapping cloverField="TO_DATE" trim="true" xpath="TO_DATE"/>
+    <Mapping cloverField="FROM_DATE" trim="true" xpath="FROM_DATE"/>
+    <Mapping cloverField="SEQNO" trim="true" xpath="SEQNO"/>
+    <Mapping cloverField="CH_ON" trim="true" xpath="CH_ON"/>
+    <Mapping cloverField="CHANGED_BY" trim="true" xpath="CHANGED_BY"/>
+    <Mapping cloverField="HIST_FLAG" trim="true" xpath="HIST_FLAG"/>
+    <Mapping cloverField="TEXTFLAG" trim="true" xpath="TEXTFLAG"/>
+    <Mapping cloverField="REF_FLAG" trim="true" xpath="REF_FLAG"/>
+    <Mapping cloverField="CNFRM_FLAG" trim="true" xpath="CNFRM_FLAG"/>
+    <Mapping cloverField="SCREENCTRL" trim="true" xpath="SCREENCTRL"/>
+    <Mapping cloverField="REASON" trim="true" xpath="REASON"/>
+    <Mapping cloverField="FLAG1" trim="true" xpath="FLAG1"/>
+    <Mapping cloverField="FLAG2" trim="true" xpath="FLAG2"/>
+    <Mapping cloverField="FLAG3" trim="true" xpath="FLAG3"/>
+    <Mapping cloverField="FLAG4" trim="true" xpath="FLAG4"/>
+    <Mapping cloverField="RESERVED1" trim="true" xpath="RESERVED1"/>
+    <Mapping cloverField="RESERVED2" trim="true" xpath="RESERVED2"/>
+    <Mapping cloverField="INITIALS" trim="true" xpath="INITIALS"/>
+    <Mapping cloverField="LAST_NAME" trim="true" xpath="LAST_NAME"/>
+    <Mapping cloverField="LAST_NAME2" trim="true" xpath="LAST_NAME2"/>
+    <Mapping cloverField="FIRSTNAME" trim="true" xpath="FIRSTNAME"/>
+    <Mapping cloverField="TITLE" trim="true" xpath="TITLE"/>
+    <Mapping cloverField="TITLE_2" trim="true" xpath="TITLE_2"/>
+    <Mapping cloverField="ARI_TITLE" trim="true" xpath="ARI_TITLE"/>
+    <Mapping cloverField="NAMEAFFIX" trim="true" xpath="NAMEAFFIX"/>
+    <Mapping cloverField="NAMEPREFIX" trim="true" xpath="NAMEPREFIX"/>
+    <Mapping cloverField="KNOWN_AS" trim="true" xpath="KNOWN_AS"/>
+    <Mapping cloverField="NAME_FORM" trim="true" xpath="NAME_FORM"/>
+    <Mapping cloverField="FORMOFADR" trim="true" xpath="FORMOFADR"/>
+    <Mapping cloverField="GENDER" trim="true" xpath="GENDER"/>
+    <Mapping cloverField="BIRTHDATE" trim="true" xpath="BIRTHDATE"/>
+    <Mapping cloverField="BIRTHCTRY" trim="true" xpath="BIRTHCTRY"/>
+    <Mapping cloverField="BIRTHSTATE" trim="true" xpath="BIRTHSTATE"/>
+    <Mapping cloverField="BIRTHPLACE" trim="true" xpath="BIRTHPLACE"/>
+    <Mapping cloverField="NATIONAL" trim="true" xpath="NATIONAL"/>
+    <Mapping cloverField="NATIONAL_2" trim="true" xpath="NATIONAL_2"/>
+    <Mapping cloverField="NATIONAL_3" trim="true" xpath="NATIONAL_3"/>
+    <Mapping cloverField="LANGU" trim="true" xpath="LANGU"/>
+    <Mapping cloverField="RELIGION" trim="true" xpath="RELIGION"/>
+    <Mapping cloverField="MAR_STATUS" trim="true" xpath="MAR_STATUS"/>
+    <Mapping cloverField="MAR_DATE" trim="true" xpath="MAR_DATE"/>
+    <Mapping cloverField="NO_O_CHLDR" trim="true" xpath="NO_O_CHLDR"/>
+    <Mapping cloverField="NAME_CON" trim="true" xpath="NAME_CON"/>
+    <Mapping cloverField="PERMO" trim="true" xpath="PERMO"/>
+    <Mapping cloverField="PERID" trim="true" xpath="PERID"/>
+    <Mapping cloverField="BIRTHDTPP" trim="true" xpath="BIRTHDTPP"/>
+    <Mapping cloverField="FST_NAME_K" trim="true" xpath="FST_NAME_K"/>
+    <Mapping cloverField="LST_NAME_K" trim="true" xpath="LST_NAME_K"/>
+    <Mapping cloverField="FST_NAME_R" trim="true" xpath="FST_NAME_R"/>
+    <Mapping cloverField="LST_NAME_R" trim="true" xpath="LST_NAME_R"/>
+    <Mapping cloverField="BIRTHNME_K" trim="true" xpath="BIRTHNME_K"/>
+    <Mapping cloverField="BIRTHNME_R" trim="true" xpath="BIRTHNME_R"/>
+    <Mapping cloverField="NICKNAME_K" trim="true" xpath="NICKNAME_K"/>
+    <Mapping cloverField="NICKNAME_R" trim="true" xpath="NICKNAME_R"/>
+    <Mapping cloverField="BIRTHYEAR" trim="true" xpath="BIRTHYEAR"/>
+    <Mapping cloverField="BIRTHMONTH" trim="true" xpath="BIRTHMONTH"/>
+    <Mapping cloverField="BIRTHDAY" trim="true" xpath="BIRTHDAY"/>
+    <Mapping cloverField="LASTNAME_M" trim="true" xpath="LASTNAME_M"/>
+    <Mapping cloverField="FSTNAME_M" trim="true" xpath="FSTNAME_M"/>
+    <Mapping cloverField="id" trim="true" xpath="@id"/>
+  </Context>
 </Context>
 ]]></attr>
 <attr name="_data_format"><![CDATA[XML]]></attr>
 <attr name="__rootGlobalElementName"><![CDATA[BAPI_EMPLOYEE_GETDATA]]></attr>
 </Node>
 <Edge debugMode="true" fromNode="FOREACH_BAPI_EMPLOYEE_GETDATA_BAPI_X005F_EMPLOYEE_X005F_GETDATA:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="f2b83b3e-6dc1-49fa-8e44-e4744d7ac297" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+<Edge debugMode="true" fromNode="FOREACH_ROW_BAPI_X005F_EMPLOYEE_X005F_GETDATA:0" guiBendpoints="" id="Edge3" inPort="Port 1 (in)" metadata="f2b83b3e-6dc1-49fa-8e44-e4744d7ac297" outPort="Port 0 (out)" toNode="MAP_WRITER0:1"/>
 <Edge debugMode="true" fromNode="XML_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="d3a325dd-7031-4f9d-bafb-d18fdfa4edb5" outPort="Port 0 (out)" toNode="FOREACH_BAPI_EMPLOYEE_GETDATA_BAPI_X005F_EMPLOYEE_X005F_GETDATA:0"/>
+<Edge debugMode="true" fromNode="XML_READER0:1" guiBendpoints="" id="Edge2" inPort="Port 0 (in)" metadata="f5d2c3ed-5174-4fa2-8f3e-6bf92728595e" outPort="Port 1 (out)" toNode="FOREACH_ROW_BAPI_X005F_EMPLOYEE_X005F_GETDATA:0"/>
 </Phase>
 </Graph>

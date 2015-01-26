@@ -7,15 +7,12 @@
 package org.mule.templates.integration;
 
 import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
@@ -38,13 +35,6 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	private static SubflowInterceptingChainLifecycleWrapper queryWorkdayEmployeeSubflow;
 	
 	private Map<String, Object> createdEmployee = null;
-
-	@BeforeClass
-	public static void init(){
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		Calendar cal = Calendar.getInstance();
-		System.setProperty("migration.startDate", "\"" + sdf.format(cal.getTime()) + "\"");	
-	}
 	
 	@Before
 	public void setUp() throws Exception {
@@ -87,7 +77,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 			Map<String, Object> employee = new HashMap<String, Object>();
 			long prefix = System.currentTimeMillis();
 			employee.put("FirstName", "Amy");
-			employee.put("LastName", "Adams" + prefix);
+			employee.put("LastName", "Evans" + prefix);
 			Object response = createSapEmployeeSubflow.process(getTestEvent(employee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
 			System.err.println("createTestDataInSandBox " + response.getClass());
 			System.err.println("createTestDataInSandBox " + response);
