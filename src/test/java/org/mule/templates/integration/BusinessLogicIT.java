@@ -55,21 +55,18 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	}
 
 	@Test
-	public void testMainFlow() throws Exception {
-		/*
-		
+	public void testMainFlow() throws Exception {		
 		Thread.sleep(30000);
 		
 		runFlow("triggerFlow");
 		
 		Thread.sleep(1000*60*6);
-
+		
 		createdEmployee.put("PersonalNumber", createdEmployee.get("PersonalNumber"));
 		createdEmployee.put("EmployeeNumber", createdEmployee.get("EmployeeNumber"));
 		// Find migrated employee by ID
 		Object response = queryWorkdayEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
 		Assert.assertNotNull(response);
-		*/
 	}
 
 	/*
