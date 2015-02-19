@@ -6,20 +6,18 @@
 	<parent>
 		<groupId>org.mule.templates</groupId>
 		<artifactId>templates-tooling-parent-pom</artifactId>
-		<version>1.0.8</version>
+		<version>1.0.16</version>
 	</parent>
 
 	<artifactId>template-sap2wday-employee-migration</artifactId>
 	<packaging>mule</packaging>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>template-sap2wday-employee-migration Anypoint Template Project</name>
 
 	<properties>
-		<workday.version>3.0.0</workday.version>
-		<sfdc.version>5.4.8</sfdc.version>
 		<sap.jco.version>3.0.10</sap.jco.version>
 		<sap.idoc.version>3.0.10</sap.idoc.version>
-		<sap.build.type>linux64</sap.build.type>
+		<sap.build.type>mac64</sap.build.type>
 	</properties>
 
 	<build>
@@ -91,13 +89,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-workday</artifactId>
-			<version>${workday.version}</version>
+			<artifactId>mule-module-workday-humanresources</artifactId>
+			<version>${wday.hr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-sfdc</artifactId>
-			<version>${sfdc.version}</version>
+			<artifactId>mule-module-workday-staffing</artifactId>
+			<version>${wday.hr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sap.conn.jco</groupId>
@@ -174,6 +172,4 @@
 		<url>http://github.com/mulesoft/template-sap2wday-employee-migration</url>
 		<tag>HEAD</tag>
 	</scm>
-	
-
 </project>
