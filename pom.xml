@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.mule.templates</groupId>
 		<artifactId>templates-tooling-parent-pom</artifactId>
-		<version>1.0.16</version>
+		<version>1.1.9</version>
 	</parent>
 
 	<artifactId>template-sap2wday-employee-migration</artifactId>
 	<packaging>mule</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<name>template-sap2wday-employee-migration Anypoint Template Project</name>
 
 	<properties>
@@ -73,7 +73,7 @@
 						<configuration>
 							<tasks>
 								<zip destfile="${project.build.directory}/${project.build.finalName}.zip" update="true">
-									<zipfileset dir="${project.build.directory}/temp-native-lib" prefix="lib" />
+									<zipfileset dir="${project.build.directory}/temp-native-lib" prefix="lib"/>
 								</zip>
 							</tasks>
 						</configuration>
@@ -136,6 +136,12 @@
     <dependency>
             <groupId>com.mulesoft.muleesb.modules</groupId>
             <artifactId>mule-module-batch-ee</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>

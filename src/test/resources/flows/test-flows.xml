@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
+<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
+	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
+	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" 
+	xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
+	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	version="EE-3.6.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -12,7 +19,7 @@ http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
     <data-mapper:config name="Map_To_XML" transformationGraphPath="map_to_xml.grf" doc:name="Map_To_XML"/>
     <data-mapper:config name="XML_To_Map_1" transformationGraphPath="xml_to_map_1.grf" doc:name="XML_To_Map"/>
-    <sub-flow name="createSapEmployeeSubflow" doc:name="createSapEmployeeSubflow">
+    <sub-flow name="createSapEmployeeSubflow" >
         <logger message="yyyyyy before upsert #[payload]" level="INFO" doc:name="Logger"/>
         <enricher source="#[payload['EmployeeNumber']]" target="#[flowVars['EmployeeNumber']]" doc:name="Message Enricher">
             <processor-chain doc:name="Processor Chain">
@@ -23,6 +30,7 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
 		<OBJECT>RP_PREL</OBJECT>      
 	</import>
 </ZMULE_NUMBER_GET_NEXT>]]></sap:definition>
+
 
 
                 </sap:outbound-endpoint>
@@ -39,7 +47,7 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
         <set-payload value="#[flowVars['EmployeeNumber']]" doc:name="Set Payload"/>
     
     </sub-flow>
-    <sub-flow name="queryWorkdayEmployeeSubflow" doc:name="queryWorkdayEmployeeSubflow">
+    <sub-flow name="queryWorkdayEmployeeSubflow" >
         <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="Workday Human Resource"/>
         <set-payload value="#[payload.getEmployeeData().get(0).getEmployeeID()]" doc:name="Set Payload"/>
         <logger message="workday response #[payload]" level="INFO" doc:name="Logger"/>

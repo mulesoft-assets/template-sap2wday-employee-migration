@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,7 @@ import com.mulesoft.module.batch.BatchTestHelper;
 public class BusinessLogicIT extends AbstractTemplateTestCase {
 
 	protected static final int TIMEOUT_SEC = 120;
+	private static final Logger LOGGER = LogManager.getLogger(BusinessLogicIT.class);
 	private static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
 	private BatchTestHelper helper;
 
@@ -56,14 +59,12 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 
 	@Test
 	public void testMainFlow() throws Exception {		
-		Thread.sleep(30000);
+		Thread.sleep(3000);
 		
 		runFlow("triggerFlow");
 		
-		Thread.sleep(1000*60*6);
+		Thread.sleep(180000);
 		
-		createdEmployee.put("PersonalNumber", createdEmployee.get("PersonalNumber"));
-		createdEmployee.put("EmployeeNumber", createdEmployee.get("EmployeeNumber"));
 		// Find migrated employee by ID
 		Object response = queryWorkdayEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
 		Assert.assertNotNull(response);
@@ -79,7 +80,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 			employee.put("FirstName", "Amy");
 			employee.put("LastName", "Evans" + prefix);
 			Object response = createSapEmployeeSubflow.process(getTestEvent(employee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
-			System.err.println("createTestDataInSandBox " + response);
+			LOGGER.info("CreateTestDataInSandBox response: " + response);
 			employee.put("PersonalNumber", response);
 			createdEmployee = employee;
 		} catch (Exception e) {
