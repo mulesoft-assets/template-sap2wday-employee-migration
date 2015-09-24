@@ -1,89 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
-	  xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
-	  xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
-	  xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" 
-	  xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
-	  xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio" 
-	  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
-	  xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" 
-	  xmlns:json="http://www.mulesoft.org/schema/mule/json" 
-	  xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
-	  xmlns:batch="http://www.mulesoft.org/schema/mule/batch" 
-	  xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" 
-	  xmlns="http://www.mulesoft.org/schema/mule/core" 
-	  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
-	  xmlns:spring="http://www.springframework.org/schema/beans" 
-	  version="EE-3.6.2" 
-	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+<mule version="3.7.2"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"   
+	xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
+	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
+	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
+	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" 
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
-http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
-http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd">
-    <data-mapper:config name="XML_To_Map" transformationGraphPath="xml_to_map.grf" doc:name="XML_To_Map"/>
-    <data-mapper:config name="Map_To_ChangePreferredNameRequestType" transformationGraphPath="map_to_changepreferrednamerequesttype.grf" doc:name="Map_To_ChangePreferredNameRequestType"/>
-	<data-mapper:config name="User_To_HireEmployeeRequestType_1" transformationGraphPath="user_to_hireemployeerequesttype_1.grf" doc:name="User_To_HireEmployeeRequestType_1"/>
-    <batch:job name="businessLogicBatch" max-failed-records="-1">
+http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+
+    <batch:job name="migrateEmployeesBatch" max-failed-records="-1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
-        <batch:input>
-            <data-mapper:transform config-ref="XML_To_Map" doc:name="SAP Employee to Map"/>
-        </batch:input>
-
         <batch:process-records>
-
+           
             <batch:step name="getUserInWdayStep" accept-policy="ALL">
-
-                <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[recordVars['existingWorker']]" doc:name="store result in 'existingWorker'">
-                    <wd-hr:get-employee config-ref="Workday_Human_Resource" employeeRequest-ref="#[org.mule.templates.WorkersRequest.createEmployeeRequest(payload['PersonalNumber'], '${wday.system.id}')]" doc:name="query Workday for existing employee"/>
+                <enricher source="#[payload.getEmployeeData().get(0).getEmployeeID()]" target="#[payload.existingWorkerId]" doc:name="store result in 'existingWorkerId'">
+                    <processor-chain doc:name="Processor Chain">
+                        <dw:transform-message doc:name="Create EmployeeGetType">
+                        	<dw:input-payload mimeType="application/java"/>
+                            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	employeeReference: {
+		integrationIDReference : {
+			ID: {
+				systemID : p('wday.system.id'),
+				value    : payload.personalNumber
+			}
+		}
+	}
+} as :object { class : "com.workday.hr.EmployeeGetType" }]]></dw:set-payload>
+                        </dw:transform-message>
+                        <wd-hr:get-employee config-ref="Workday_Human_Resource" doc:name="query Workday for existing employee"/>
+                    </processor-chain>
                 </enricher>
 
             </batch:step>
-            <batch:step name="insertWorkerStep" accept-expression="recordVars['existingWorker'] == null" accept-policy="ALL">
-
-                <expression-component doc:name="prepare for insert"><![CDATA[payload.put("Address","${wday.address}");
-payload.put("Email", "${wday.email}");
-payload.put("Id", payload.get('PersonalNumber'));
-
-
-]]></expression-component>
-
-                <data-mapper:transform config-ref="User_To_HireEmployeeRequestType_1" doc:name="User To HireEmployeeRequestType">
-                    <data-mapper:input-arguments>
-                        <data-mapper:input-argument key="country">${wday.country}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="postalCode">${wday.postalCode}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="state">${wday.state}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="city">${wday.city}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="location">${wday.location}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="organization">${wday.organization}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="jobprofile">${wday.jobprofileId}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="currency">${wday.currency}</data-mapper:input-argument>
-                        <data-mapper:input-argument key="systemId">${wday.system.id}</data-mapper:input-argument>
-                    </data-mapper:input-arguments>
-                </data-mapper:transform>
-
+            <batch:step name="insertWorkerStep" accept-expression="payload.existingWorkerId == null" accept-policy="ALL">
+                <logger message="Insert employee: #[payload]" level="INFO" doc:name="Logger"/>
+                <dw:transform-message doc:name="Employee to HireEmployeeRequestType">
+                	<dw:input-payload mimeType="application/java"/>
+                    <dw:set-payload resource="classpath:MapToHireEmployeeRequestType.dwl"/>
+                </dw:transform-message>
                 <wd-staffing:hire-employee config-ref="Workday_Staffing" doc:name="create Workday employee"/>
-
             </batch:step>
-            <batch:step name="updateWorkerStep" accept-expression="recordVars['existingWorker'] != null" accept-policy="ALL">
-
-                <expression-component doc:name="prepare for update"><![CDATA[payload.put("Country", "${wday.country}");
-payload.put("Id", recordVars['existingWorker']);]]></expression-component>
-
-                <data-mapper:transform config-ref="Map_To_ChangePreferredNameRequestType" doc:name="Map to EmployeeGetType"/>
+            
+            <batch:step name="updateWorkerStep" accept-expression="payload.existingWorkerId != null" accept-policy="ALL">
+                <logger message="Updating employee: #[payload]" level="INFO" doc:name="Logger"/>
+                <dw:transform-message doc:name="Map to ChangePreferredNameRequestType">
+                	<dw:input-payload mimeType="application/java"/>
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	changePreferredNameData : {
+		nameData : {
+			firstName : payload.firstName,
+			lastName  : payload.lastName,
+			countryReference : {
+				ID : [{
+					type  : "ISO_3166-1_Alpha-3_Code",
+					value : p('wday.country')
+				}]
+			}
+		},
+		workerReference : {
+			ID : [{
+				type  : "Employee_ID",
+				value : payload.existingWorkerId
+			}]
+		}
+	}	
+} as :object { class : "com.workday.hr.ChangePreferredNameRequestType" }]]></dw:set-payload>
+                </dw:transform-message>
                 <wd-hr:change-preferred-name config-ref="Workday_Human_Resource" doc:name="update Workday employee"/>
-
             </batch:step>
         </batch:process-records>
+        
         <batch:on-complete>
             <scatter-gather doc:name="All">
                 <processor-chain>
@@ -91,14 +102,12 @@ payload.put("Id", recordVars['existingWorker']);]]></expression-component>
                     <logger message="Migration process has finished: #[payload]" level="INFO" doc:name="log 'Migration process has finished'"/>
                 </processor-chain>
                 <processor-chain>
-                    <json:object-to-json-transformer doc:name="transform BatchJobInstance to JSON"/>
-                    <smtp:outbound-endpoint host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" connector-ref="gmailConnector" to="${mail.to}" from="${mail.from}" subject="${mail.subject}" responseTimeout="10000" doc:name="send mail"/>
+                    <parse-template location="./src/main/resources/email/body.html" doc:name="Parse Template"/>
+                    <smtp:outbound-endpoint host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${smtp.password}" connector-ref="gmailConnector" to="${mail.to}" from="${mail.from}" subject="${mail.subject}" responseTimeout="10000" mimeType="text/html" doc:name="send e-mail"/>
                 </processor-chain>
             </scatter-gather>
         </batch:on-complete>
+        
     </batch:job>
-
-
-    
     
 </mule>

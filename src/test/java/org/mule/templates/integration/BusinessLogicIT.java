@@ -17,7 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.MessageExchangePattern;
-import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 
 import com.mulesoft.module.batch.BatchTestHelper;
@@ -29,7 +29,8 @@ import com.mulesoft.module.batch.BatchTestHelper;
  */
 public class BusinessLogicIT extends AbstractTemplateTestCase {
 
-	protected static final int TIMEOUT_SEC = 120;
+	private static final long TIMEOUT_MILLIS = 300000;
+	private static final long DELAY_MILLIS = 500;
 	private static final Logger LOGGER = LogManager.getLogger(BusinessLogicIT.class);
 	private static final String PATH_TO_TEST_PROPERTIES = "./src/test/resources/mule.test.properties";
 	private BatchTestHelper helper;
@@ -41,29 +42,23 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	
 	@Before
 	public void setUp() throws Exception {
-		helper = new BatchTestHelper(muleContext);
-
-		createSapEmployeeSubflow = getSubFlow("createSapEmployeeSubflow");
-		createSapEmployeeSubflow.initialise();
-		queryWorkdayEmployeeSubflow = getSubFlow("queryWorkdayEmployeeSubflow");
-		queryWorkdayEmployeeSubflow.initialise();
-
 		final Properties props = new Properties();
     	try {
     		props.load(new FileInputStream(PATH_TO_TEST_PROPERTIES));
     	} catch (Exception e) {
     	   logger.error("Error occured while reading mule.test.properties", e);
     	} 
+    	initializeSubFlows();
     	createTestDataInSandBox();
+    	helper = new BatchTestHelper(muleContext);
 	}
 
 	@Test
 	public void testMainFlow() throws Exception {		
 		Thread.sleep(3000);
-		
 		runFlow("triggerFlow");
+		helper.awaitJobTermination(TIMEOUT_MILLIS, DELAY_MILLIS);
 		
-		Thread.sleep(180000);
 		
 		// Find migrated employee by ID
 		Object response = queryWorkdayEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
@@ -73,20 +68,20 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	/*
 	 * Creates employee in Workday suitable for a migration.
 	 */
-	private void createTestDataInSandBox() throws MuleException, Exception {
-		try {
-			Map<String, Object> employee = new HashMap<String, Object>();
-			long prefix = System.currentTimeMillis();
-			employee.put("FirstName", "Amy");
-			employee.put("LastName", "Evans" + prefix);
-			Object response = createSapEmployeeSubflow.process(getTestEvent(employee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
+	private void createTestDataInSandBox() throws Exception {
+			createdEmployee = new HashMap<String, Object>();
+			createdEmployee.put("FirstName", "Amy");
+			createdEmployee.put("LastName", "Evans" + System.currentTimeMillis());
+			
+			String response = (String) createSapEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
 			LOGGER.info("CreateTestDataInSandBox response: " + response);
-			employee.put("PersonalNumber", response);
-			createdEmployee = employee;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			createdEmployee.put("PersonalNumber", response);
 	}
-
 	
+	private void initializeSubFlows() throws InitialisationException {
+		createSapEmployeeSubflow = getSubFlow("createSapEmployeeSubflow");
+		createSapEmployeeSubflow.initialise();
+		queryWorkdayEmployeeSubflow = getSubFlow("queryWorkdayEmployeeSubflow");
+		queryWorkdayEmployeeSubflow.initialise();
+	}
 }

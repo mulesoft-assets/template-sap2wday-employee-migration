@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
+<mule version="3.7.2"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" 
+	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
 	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
-	xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" 
 	xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
-	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" 
 	xmlns="http://www.mulesoft.org/schema/mule/core" 
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
-	version="EE-3.6.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/mule/wd-staffing/current/mule-wd-staffing.xsd
-http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
 http://www.mulesoft.org/schema/mule/wd-hr http://www.mulesoft.org/schema/mule/wd-hr/current/mule-wd-hr.xsd
-http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
-    <data-mapper:config name="Map_To_XML" transformationGraphPath="map_to_xml.grf" doc:name="Map_To_XML"/>
-    <data-mapper:config name="XML_To_Map_1" transformationGraphPath="xml_to_map_1.grf" doc:name="XML_To_Map"/>
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+
     <sub-flow name="createSapEmployeeSubflow" >
-        <logger message="yyyyyy before upsert #[payload]" level="INFO" doc:name="Logger"/>
-        <enricher source="#[payload['EmployeeNumber']]" target="#[flowVars['EmployeeNumber']]" doc:name="Message Enricher">
+        <logger message="Inserting test employee: #[payload]" level="INFO" doc:name="Logger"/>
+        <enricher source="#[payload.EmployeeNumber]" target="#[flowVars.EmployeeNumber]" doc:name="Message Enricher">
             <processor-chain doc:name="Processor Chain">
                 <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="ZMULE_NUMBER_GET_NEXT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="get next Employee Number">
                     <sap:definition><![CDATA[<ZMULE_NUMBER_GET_NEXT>
@@ -34,17 +31,172 @@ http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/
 
 
                 </sap:outbound-endpoint>
-                <data-mapper:transform config-ref="XML_To_Map_1" doc:name="XML To Map"/>
-                <logger message="XXXXXX next number #[payload]" level="INFO" doc:name="Logger"/>
+                <dw:transform-message doc:name="Extract Employee Number">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+EmployeeNumber : payload.ZMULE_NUMBER_GET_NEXT.export.NUMBER]]></dw:set-payload>
+                </dw:transform-message>
+
+                <logger message="New employee number #[payload]" level="INFO" doc:name="Logger"/>
             </processor-chain>
         </enricher>
-        <expression-component doc:name="Expression"><![CDATA[payload.put("EmployeeNumber", flowVars['EmployeeNumber']);]]></expression-component>
-        <data-mapper:transform config-ref="Map_To_XML" doc:name="Map To XML"/>
-        <byte-array-to-string-transformer doc:name="Byte Array to String"/>
-        <logger message="XXXXXXXXXXXXXXXXXXX  #[payload]" level="INFO" doc:name="Logger"/>
+
+        <dw:transform-message doc:name="Map to XML">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+---
+BAPI_HRMASTER_SAVE_REPL_MULT : {
+	tables : {
+		EMPLOYEE_ORG_ASSIGNMENT : {
+			row : {
+				OBJ_ID              : flowVars.EmployeeNumber,
+				INFOTYPE            : "0001",
+				TO_DATE             : "99991231",
+				FROM_DATE           : now as :string {format: "YYYYMMdd"},
+				COMP_CODE           : p('sap.hire.org.COMP_CODE'),
+				PERS_AREA           : p('sap.hire.org.PERS_AREA'),
+				EMPLOYEE_GROUP      : p('sap.hire.org.EMPLOYEE_GROUP'),
+				EMPLOYEE_SUBGROUP   : p('sap.hire.org.EMPLOYEE_SUBGROUP'),
+				PERSONNEL_SUBAREA   : p('sap.hire.org.PERSONNEL_SUBAREA'),
+				LEGAL_PERSON        : p('sap.hire.org.LEGAL_PERSON'),
+				PAYROLL_AREA        : p('sap.hire.org.PAYROLL_AREA'),
+				COSTCENTER          : p('sap.hire.org.COSTCENTER'),
+				ORG_UNIT            : p('sap.hire.org.ORG_UNIT'),
+				POSITION            : p('sap.hire.org.POSITION'),
+				JOB                 : p('sap.hire.org.JOB'),
+				OBJ_TYPE            : "S"
+			}
+		},
+		EMPLOYEE_PERSONAL_DATA : {
+			row : {
+				OBJ_ID                    : flowVars.EmployeeNumber,
+				INFOTYPE                  : "0002",
+				SUBTYPE                   : "",
+				OBJECT_IDENTIFICATION     : "",
+				LOCKINDIC                 : "",
+				TO_DATE                   : "99991231",
+				FROM_DATE                 : now as :string {format: "YYYYMMdd"},
+				LAST_NAME                 : payload.LastName,
+				SECOND_NAME               : payload.MiddleName default "",
+				FIRST_NAME                : payload.FirstName,
+				FULL_EMPLOYEE_NAME        : payload.FirstName ++ " " ++ payload.LastName,
+				KNOWN_AS                  : payload.FirstName,
+				MIDDLE_NAME               : payload.MiddleName default "",
+				NAME_FORMAT_INDICATOR     : "0",
+				FORM_OF_ADDRESS_KEY       : "1",
+				GENDER_KEY                : payload.Gender default "1",
+				DATE_BIRTH                : p('sap.hire.default.dob') replace /-/ with "",
+				COUNTRY_OF_BIRTH          : "US",
+				STATE                     : "NJ",
+				BIRTHPLACE                : "Parsippany",
+				NATIONALITY               : "US",
+				THIRD_NATIONALITY         : "US",
+				LANGU                     : "EN",
+				NUMBER_OF_CHILDREN        : "1",
+				MODIFIER_FOR_PERSONNEL_ID : "10",
+				PERSIDNO                  : payload.Ssn default "547547574",
+				YEAR_OF_BIRTH             : "1980",
+				MONTH_OF_BIRTH            : "01",
+				DAY_OF_BIRTH              : "01",
+				LAST_NAME_MATCHCODE       : upper payload.LastName,
+				FIRST_NAME_MATCHCODE      : upper payload.FirstName
+			}
+		},
+		EMPLOYEE_PERSONNEL_ACTION : {
+			row : {
+				OBJ_ID                  : flowVars.EmployeeNumber,
+				INFOTYPE                : "0000",
+				TO_DATE                 : "99991231",
+				FROM_DATE               : now as :string {format: "YYYYMMdd"},
+				ACTION_TYPE             : "01",
+				EMPLOYMENT_STATUS       : "3",
+				SPECIAL_PAYMENT_STATUS  : "1"	
+			}
+		},
+		EMPLOYEE_PAYROLL_STATUS : {
+			row : {
+				OBJ_ID                        : flowVars.EmployeeNumber,
+				INFOTYPE                      : "0003",
+				TO_DATE                       : "99991231",
+				FROM_DATE                     : "18000101",
+				EARLIEST_MD_CHANGE_SINCE_PAYR : now as :string {format: "YYYYMMdd"},
+				PDC_RECALCULATION_DATE        : now as :string {format: "YYYYMMdd"},
+				PERS_NO_INPUT_DATE            : now as :string {format: "YYYYMMdd"},
+				INITIAL_ENTRY_TIME            : now as :string {format: "HHmmss"},
+				INFOTYPE_VIEW_IND             : "10",
+				EARLIEST_PAYROLL_MD_CHANGE    : now as :string {format: "YYYYMMdd"}
+			}
+		},
+		HR_INFOTYPE_HEADER : {
+			row : {
+				PLAN_VER   : "01",
+				OBJ_TYPE   : "P",
+				OBJ_ID     : flowVars.EmployeeNumber,
+				INFOTYPE   : "0000",
+				FROM_DATE  : now as :string {format: "YYYYMMdd"},
+				TO_DATE    : "99991231"
+			},
+			row: {
+				PLAN_VER   : "01",
+				OBJ_TYPE   : "P",
+				OBJ_ID     : flowVars.EmployeeNumber,
+				INFOTYPE   : "0001",
+				FROM_DATE  : now as :string {format: "YYYYMMdd"},
+				TO_DATE    : "99991231"
+			},
+			row: {
+				PLAN_VER   : "01",
+				OBJ_TYPE   : "P",
+				OBJ_ID     : flowVars.EmployeeNumber,
+				INFOTYPE   : "0002",
+				FROM_DATE  : now as :string {format: "YYYYMMdd"},
+				TO_DATE    : "99991231"
+			},
+			row: {
+				PLAN_VER   : "01",
+				OBJ_TYPE   : "P",
+				OBJ_ID     : flowVars.EmployeeNumber,
+				INFOTYPE   : "0003",
+				FROM_DATE  : now as :string {format: "YYYYMMdd"},
+				TO_DATE    : "99991231"
+			},
+			row: {
+				PLAN_VER   : "01",
+				OBJ_TYPE   : "P",
+				OBJ_ID     : flowVars.EmployeeNumber,
+				INFOTYPE   : "0105",
+				SUBTYPE    : "0001",
+				FROM_DATE  : now as :string {format: "YYYYMMdd"},
+				TO_DATE    : "99991231"
+			},
+			row : {
+				PLAN_VER  : "01",
+				OBJ_TYPE  : "P",
+				OBJ_ID    : flowVars.EmployeeNumber,
+				INFOTYPE  : "0105",
+				SUBTYPE   : "0010",
+				FROM_DATE : now as :string {format: "YYYYMMdd"},
+				TO_DATE   : "99991231"
+			}
+		},
+		HR_OBJECT_HEADER : {
+			row: {
+				PLAN_VER  : "01",
+				OBJ_TYPE  : "P",
+				OBJ_ID    : flowVars.EmployeeNumber,
+				OPERATOR  : "I"
+			}
+		}
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <object-to-string-transformer doc:name="Object to String"/>
+
+        <logger message="SAP request  #[payload]" level="INFO" doc:name="Logger"/>
         <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_HRMASTER_SAVE_REPL_MULT" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="SAP" bapiTransaction="true" evaluateFunctionResponse="true"/>
-        <logger level="INFO" doc:name="Logger" message="XXXXXXXXXXXXXXXXXXX  sap response #[payload]"/>
-        <set-payload value="#[flowVars['EmployeeNumber']]" doc:name="Set Payload"/>
+        <logger level="INFO" doc:name="Logger" message="SAP response #[payload]"/>
+        <set-payload value="#[flowVars.EmployeeNumber]" doc:name="Set Payload"/>
     
     </sub-flow>
     <sub-flow name="queryWorkdayEmployeeSubflow" >

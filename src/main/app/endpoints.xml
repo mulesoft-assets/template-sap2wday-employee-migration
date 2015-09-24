@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
+<mule version="3.7.2"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
 	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
 	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" 
@@ -9,16 +11,15 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:core="http://www.mulesoft.org/schema/mule/core" 
-	version="EE-3.6.2" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration"/>
 
     <flow name="triggerFlow"  processingStrategy="synchronous" doc:description="This is the simpliest entry point to start the excecution of your Kick
 Here you should: 
@@ -27,7 +28,7 @@ Here you should:
 Here you should not: 
 	* Run validations against external systems
 	* Choose flow of your application based on input parameters">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/migrateemployees" doc:name="HTTP">
+        <http:listener config-ref="HTTP" path="/migrateemployees" doc:name="HTTP">
             <http:response-builder statusCode="200"/>
         </http:listener>
 
@@ -40,8 +41,21 @@ Here you should not:
 
 
         </sap:outbound-endpoint>
+          <dw:transform-message doc:name="SAP Employees to Maps">
+                <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA.*row map {
+	firstName       : $.FIRSTNAME,
+	lastName        : $.LAST_NAME,
+	gender          : $.GENDER,
+	title           : $.TITLE,
+	personalNumber  : $.PERNO
+} unless (payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA is :empty) otherwise []]]></dw:set-payload>
+            </dw:transform-message>
 
-        <batch:execute name="businessLogicBatch" doc:name="Batch Execute"/>
+
+        <batch:execute name="migrateEmployeesBatch" doc:name="Execute migrateEmployeesBatch"/>
 
         <set-payload value="&lt;body style='font-family:Courier'&gt;&lt;h1&gt;Batch Process initiated&lt;/h1&gt;&lt;b&gt;ID:&lt;/b&gt;#[payload.getId()]&lt;br/&gt;&lt;b&gt;Records to Be Processed: &lt;/b&gt;#[payload.getRecordCount()]&lt;br/&gt; &lt;b&gt;Start execution on: &lt;/b&gt;#[new java.util.Date()]&lt;/body&gt;" doc:name="Build HTTP Response"/>
 
