@@ -28,18 +28,27 @@ Please review the terms of the license before downloading and using this templat
 # Use Case <a name="usecase"/>
 As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behaviour when an employee already exists in the destination system. 
+This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behavior when an employee already exists in the destination system. 
 
 As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
-The batch job is divided in Input, Process and On Complete stages.
+The batch job is divided into Input, Process and On Complete stages.
 During the Input stage the Anypoint Template will go to the SAP and query all the employees that match the filter criteria. The criteria is based on available filtering fields for standard BAPI BAPI_EMPLOYEE_GETDATA.
-The last step of the Process stage will group the employees and create them in Workday using HIRE_EMPLOYEE function call.
+The last step of the Process stage will create/update employees in Workday using HIRE_EMPLOYEE function call.
 Finally during the On Complete stage the Anypoint Template will both output statistics data into the console and send a notification email with the results of the batch execution.
 
 # Considerations <a name="considerations"/>
 
-There are a couple of things you should take into account before running this Anypoint Template:
-1. Standard BAPI for retrieving employees from SAP does not support lastModifiedDate criteria. So if you would need this functionality you would need implement custom BAPI for this.
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failling to do so could lead to unexpected behavior of the template.**
+
+## Disclaimer
+
+This Anypoint template uses a few private Maven dependencies in order to work. If you intend to run this template with Maven support, please continue reading.
+
+You will find that there are three dependencies in the pom.xml file that begin with the following group id: 
+	**com.sap.conn.jco** 
+These dependencies are private for Mulesoft and will cause you application not to build from a Maven command line. You need to replace them with "provided" scope and copy the libraries into the build path.
+
+Standard BAPI for retrieving employees from SAP does not support lastModifiedDate criteria. So if you need this functionality you will have to implement custom BAPI for this to work.
 
 
 ## SAP Considerations <a name="sapconsiderations"/>
@@ -75,7 +84,7 @@ In any of the ways you would like to run this Anypoint Template this is an examp
 <h1>Batch Process initiated</h1>
 <b>ID:</b>6eea3cc6-7c96-11e3-9a65-55f9f3ae584e<br/>
 <b>Records to Be Processed: </b>9<br/>
-<b>Start execution on: </b>Mon Jan 13 18:05:33 GMT-03:00 2014
+<b>Start execution on: </b>Thu Sep 24 18:05:33 GMT-03:00 2014
 </pre>
 
 ## Running on premise <a name="runonopremise"/>
@@ -112,11 +121,11 @@ Once you have imported you Anypoint Template into Anypoint Studio you need to fo
 
 ### Running on Mule ESB stand alone <a name="runonmuleesbstandalone"/>
 Complete all properties in one of the property files, for example in [mule.prod.properties] (../master/src/main/resources/mule.prod.properties) and run your app with the corresponding environment variable to use it. To follow the example, this will be `mule.env=prod`. 
-After this, to trigger the use case you just need to hit the local http endpoint with the port you configured in your file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migrateemployees` and this will output a summary report and send it in the mail.
+After this, to trigger the use case you just need to hit the local HTTP Listener with the port you configured in the properties file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migrateemployees` and this will output a summary report and send it in the email.
 
 ## Running on CloudHub <a name="runoncloudhub"/>
 While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**.
-Once your app is all set and started, supposing you choose as domain name `sapemployeemigration` to trigger the use case you just need to hit `http://sapemployeemigration.cloudhub.io/migrateemployees` and report will be sent to the email configured.
+Once your app is all set and started, supposing you choose `sapemployeemigration` as domain name to trigger the use case you just need to hit `http://sapemployeemigration.cloudhub.io/migrateemployees` and report will be sent to the email configured.
 
 ### Deploying your Anypoint Template on CloudHub <a name="deployingyouranypointtemplateoncloudhub"/>
 Mule Studio provides you with really easy way to deploy your Template directly to CloudHub, for the specific steps to do so please check this [link](http://www.mulesoft.org/documentation/display/current/Deploying+Mule+Applications#DeployingMuleApplications-DeploytoCloudHub)

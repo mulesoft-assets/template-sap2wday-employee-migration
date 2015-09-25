@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
+<mule version="3.7.2"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:wd-staffing="http://www.mulesoft.org/schema/mule/wd-staffing" 
 	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
 	xmlns:wd-hr="http://www.mulesoft.org/schema/mule/wd-hr" 
 	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp" 
@@ -8,10 +10,10 @@
 	xmlns="http://www.mulesoft.org/schema/mule/core" 
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
-	version="EE-3.6.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
@@ -23,16 +25,19 @@ http://www.mulesoft.org/schema/mule/wd-staffing http://www.mulesoft.org/schema/m
 
 	<context:property-placeholder location="common.properties,mule.${mule.env}.properties"  />
     
-	<smtp:gmail-connector name="gmailConnector" doc:name="Gmail" validateConnections="true" doc:description="This is the connector used to send email notifications. You should change its configuration to select a different email provider"/>
+	<smtp:gmail-connector name="gmailConnector" doc:name="Gmail" validateConnections="true" doc:description="This is the connector used to send email notifications. You should change its configuration to select a different email provider" contentType="text/html"/>
     
     <sap:connector name="SAP" jcoAsHost="${sap.jco.ashost}" jcoUser="${sap.jco.user}" jcoPasswd="${sap.jco.passwd}" jcoSysnr="${sap.jco.sysnr}" jcoClient="${sap.jco.client}" jcoLang="${sap.jco.lang}" validateConnections="true" doc:name="SAP"/>
 
-    <wd-hr:config name="Workday_Human_Resource" hrUser="${wday.user}" hrPassword="${wday.password}" hrEndpoint="${wday.endpoint}" doc:name="Workday Human Resource">
+    <wd-hr:config name="Workday_Human_Resource" hrUser="${wday.user}" hrPassword="${wday.password}" hrEndpoint="${wday.endpoint}" doc:name="Workday Human Resource" hrWsdlLocation="https://community.workday.com/custom/developer/API/Human_Resources/v23.1/Human_Resources.wsdl">
         <wd-hr:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
     </wd-hr:config>
   
     <wd-staffing:config name="Workday_Staffing" doc:name="Workday Staffing" staffingEndpoint="${wday.endpoint}" staffingPassword="${wday.password}" staffingUser="${wday.user}">
         <wd-staffing:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
     </wd-staffing:config>
+    
+    <http:listener-config name="HTTP" host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration"/>
+    
  
 </mule>
