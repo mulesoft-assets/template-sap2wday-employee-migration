@@ -55,7 +55,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 
             </batch:step>
             <batch:step name="insertWorkerStep" accept-expression="payload.existingWorkerId == null" accept-policy="ALL">
-                <logger message="Insert employee: #[payload]" level="INFO" doc:name="Logger"/>
+                <logger message="Insert employee: #[payload]" level="INFO" doc:name="Log insert"/>
                 <dw:transform-message doc:name="Employee to HireEmployeeRequestType">
                 	<dw:input-payload mimeType="application/java"/>
                     <dw:set-payload resource="classpath:MapToHireEmployeeRequestType.dwl"/>
@@ -64,7 +64,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
             </batch:step>
             
             <batch:step name="updateWorkerStep" accept-expression="payload.existingWorkerId != null" accept-policy="ALL">
-                <logger message="Updating employee: #[payload]" level="INFO" doc:name="Logger"/>
+                <logger message="Updating employee: #[payload]" level="INFO" doc:name="Log update"/>
                 <dw:transform-message doc:name="Map to ChangePreferredNameRequestType">
                 	<dw:input-payload mimeType="application/java"/>
                     <dw:set-payload><![CDATA[%dw 1.0

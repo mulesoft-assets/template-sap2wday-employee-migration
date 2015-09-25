@@ -33,8 +33,8 @@
 							<artifactId>mule-module-workday-humanresources</artifactId>
 						</inclusion>
 						<inclusion>
-							<groupId>mule-module-workday-staffing</groupId>
-							<artifactId>mule-transport-sap</artifactId>
+							<groupId>org.mule.modules</groupId>
+							<artifactId>mule-module-workday-staffing</artifactId>
 						</inclusion>
 						<inclusion>
 							<groupId>com.mulesoft.muleesb.transports</groupId>

@@ -2,7 +2,7 @@
 %output application/java
 --- 
 {
-	version: 'v20',
+	version: 'v23.1',
 	businessProcessParameters : {
 		autoComplete : true
 	},
@@ -19,38 +19,38 @@
 					addressData: [{
 						addressLineData: [{
 							type	: 'ADDRESS_LINE_1',
-							value	: 'New York'
+							value	: p('wday.address')
 
 						}],
 						countryReference: {
 							ID: [{
 								type	: 'ISO_3166-1_Alpha-3_Code',
-								value	: 'USA'
+								value	: p('wday.country')
 							}]
 						},
 						countryRegionReference: {
 							ID: [{
 								type	: 'Country_Region_ID',
-								value	: 'USA-CA'
+								value	: p('wday.state')
 							}]
 						},
 						effectiveDate	: payload.hireDate as :date default now as :date,
-						municipality 	: 'San Francisco',
-						postalCode 		: '90001',
+						municipality 	: p('wday.city'),
+						postalCode 		: p('wday.postalCode'),
 						usageData: [{
 							typeData:[{
 								primary : true,
 								typeReference: {
 									ID: [{
 										type	: 'Communication_Usage_Type_ID',
-										value	: 'WORK'
+										value	: 'HOME'
 									}]
 								}
 							}]
 						}]
 					}],
 					emailAddressData 	: [{
-						emailAddress	: 'john.doe@aol.com',
+						emailAddress	: p('wday.email'),
 						usageData: [{
 							public: true,
 							typeData: [{
@@ -93,7 +93,7 @@
 							countryReference: {
 								ID: [{
 									type	: 'ISO_3166-1_Alpha-3_Code',
-									value	: 'USA'
+									value	: p('wday.country')
 								}]
 							},
 							firstName	: payload.firstName,
@@ -131,13 +131,13 @@
 			    	jobProfileReference: {
 			    		ID: [{
 			    			type: 'Job_Profile_ID',
-			    			value: '39905'
+			    			value: p('wday.jobprofileId')
 			    		}]
 			    	},
 			    	locationReference: {
 			    		ID: [{
 			    			type: 'Location_ID',
-			    			value: 'San_Francisco_Site'
+			    			value: p('wday.location')
 			    		}]
 			    	},
 			    	payRateTypeReference : {
@@ -157,7 +157,7 @@
 			organizationReference: {
 				ID: [{
 					type: 'Organization_Reference_ID',
-					value: '50006855'
+					value: p('wday.organization')
 				}]
 			},
 			proposeCompensationForHireSubProcess: {
@@ -185,7 +185,7 @@
 						currencyReference : {
 							ID : [{
 								type: 'Currency_ID',
-								value: 'USD'
+								value: p('wday.currency')
 							}]
 						},
 						frequencyReference : {
