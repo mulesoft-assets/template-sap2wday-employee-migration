@@ -57,8 +57,7 @@ public class BusinessLogicIT extends AbstractTemplateTestCase {
 	public void testMainFlow() throws Exception {		
 		Thread.sleep(3000);
 		runFlow("triggerFlow");
-		helper.awaitJobTermination(TIMEOUT_MILLIS, DELAY_MILLIS);
-		
+		Thread.sleep(120000);		
 		
 		// Find migrated employee by ID
 		Object response = queryWorkdayEmployeeSubflow.process(getTestEvent(createdEmployee, MessageExchangePattern.REQUEST_RESPONSE)).getMessage().getPayload();	
