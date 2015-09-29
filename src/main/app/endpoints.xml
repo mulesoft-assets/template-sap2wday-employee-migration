@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule 
+<mule version="EE-3.7.2"
 	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
 	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 

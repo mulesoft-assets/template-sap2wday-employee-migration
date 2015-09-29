@@ -167,7 +167,6 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + smtp.user `sender%40gmail.com`
 + smtp.password `secret`
 
-
 #### Mail details
 + mail.from `mail.from@example.com`
 + mail.to `info@examplecom`
