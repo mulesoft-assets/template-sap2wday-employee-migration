@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule version="EE-3.7.2"
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" 
 	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
 	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" 
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" 
@@ -35,7 +35,7 @@ Here you should not:
         <sap:outbound-endpoint exchange-pattern="request-response" connector-ref="SAP" type="function" functionName="BAPI_EMPLOYEE_GETDATA" xmlVersion="2" outputXml="true" responseTimeout="10000" doc:name="Query SAP for Employees">
             <sap:definition><![CDATA[<BAPI_EMPLOYEE_GETDATA>
   	<import>	
-		<LASTNAME_M>*EVANS144*</LASTNAME_M>   
+		<LASTNAME_M>*EVANS14*</LASTNAME_M>   
 	</import>
 </BAPI_EMPLOYEE_GETDATA>]]></sap:definition>
 
