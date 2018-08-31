@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap"
+      xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
+	<flow name="migrateEmployees" doc:id="884f86c5-66e1-4701-bb9b-594c2a60abf3" >
+    <ee:transform doc:name="Set XML input" doc:id="4648e80d-79e5-4d04-a7af-e5bdb831c068" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+  "BAPI_EMPLOYEE_GETDATA": {
+    "import": {
+      "LASTNAME_M": "*EVANS14*"
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<sap:execute-synchronous-remote-function-call key="BAPI_EMPLOYEE_GETDATA" doc:name="Query SAP for Employees" doc:id="0e92782f-9ac3-4a9f-ac02-74bb02cc9294" config-ref="SAP_config"/>
+		<ee:transform doc:name="Transform data to wday workers" doc:id="0c50175e-a04b-4ce9-a5cc-f6221ae64cd2">
+						<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+if(not isEmpty(payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA))
+payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA.*row map{
+	firstName       : $.FIRSTNAME,
+	lastName        : $.LAST_NAME,
+	gender          : $.GENDER,
+	title           : $.TITLE,
+	personalNumber  : $.PERNO
+} else []]]></ee:set-payload>
+						</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="systemId" ><![CDATA[%dw 2.0
+output application/java
+---
+p('wday.system.id')]]></ee:set-variable>
+			</ee:variables>
+					</ee:transform>
+		<batch:job jobName="migrateEmployeesBatch" doc:id="79b373e6-1aeb-43a9-9dfe-8ac0d2f31fdc" blockSize="${page.size}">
+        <batch:process-records >
+				<batch:step name="getUserInWdayStep" doc:id="232087de-e311-49c1-a890-439c65ea1af2" >
+					<ee:transform doc:name="create wday request" doc:id="a9f351e1-2703-48bd-9de9-7c93bf0e008c" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+	ns0#Employee_Get: {
+		ns0#Employee_Reference: {
+			ns0#Integration_ID_Reference : {
+				ns0#ID @(ns0#System_ID : vars.systemId) : payload.personalNumber
+			}
+		}
+	}
+}
+]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="workerData" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<workday:invoke doc:name="query workday for existing employee" doc:id="82777701-090d-4459-8853-9ad614e2cd54" config-ref="Workday_Config" service="Human_Resources" operation="Get_Workers"/>
+					<ee:transform doc:name="Extend payload about employeeId" doc:id="baab932d-0c17-4420-a8d7-7899c65fbd2c" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.workerData ++
+	{
+		employeeId: payload.body.Employee.Employee_Data.Employee_ID
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+            </batch:step>
+            	<batch:step name="insertWorkerStep" doc:id="c89ea3d4-572f-49b5-8d16-ce9d5d9ed592" acceptExpression='#[payload.employeeId == null]' acceptPolicy="ALL">
+					<ee:transform doc:name="Employee to HireEmployeeRequestType" doc:id="81a680b5-5aa8-4dfb-8643-abd0801d2948">
+						<ee:message>
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+	ns0#Hire_Employee_Request: {
+		ns0#Business_Process_Parameters : {
+			ns0#Auto_Complete : true
+		},
+		ns0#Hire_Employee_Data: {
+			ns0#Applicant_Data: {
+				ns0#External_Integration_ID_Data: {
+					ns0#ID @(ns0#System_ID : vars.systemId) : payload.personalNumber
+				},
+				ns0#Personal_Data: {
+					ns0#Contact_Data: {
+						ns0#Address_Data: [{
+							ns0#Address_Line_Data @(ns0#Type: 'ADDRESS_LINE_1') : p('wday.address'),
+							ns0#Country_Reference: {
+								ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code') : p('wday.country')
+							},
+							ns0#Country_Region_Reference: {
+								ns0#ID @(ns0#"type"	: 'Country_Region_ID') : p('wday.state')
+							},
+							ns0#Municipality 	: p('wday.city'),
+							ns0#Postal_Code 	: p('wday.postalCode'),
+							ns0#Usage_Data: [{
+								ns0#Type_Data @(ns0#Primary: true) : [{
+									ns0#Type_Reference: {
+										ns0#ID @(ns0#"type"	: 'Communication_Usage_Type_ID') : 'HOME'
+									}
+								}]
+							}]
+						}],
+						ns0#Email_Address_Data 	: [{
+							ns0#Email_Address	: p('wday.email'),
+							ns0#Usage_Data @(ns0#Public : true) : [{
+								ns0#Type_Data @(ns0#Primary: true): [{
+									ns0#Type_Reference: {
+										ns0#ID @(ns0#"type"	: 'Communication_Usage_Type_ID') : 'HOME'
+									}
+								}]
+							}]
+						}],
+						ns0#Phone_Data: [{
+							ns0#International_Phone_Code: '1',
+							ns0#Phone_Device_Type_Reference: {
+								ns0#ID @(ns0#"type"	: 'Phone_Device_Type_ID') : '1063.5'
+							},
+							ns0#Phone_Number		: p('wday.postalCode') default null,
+							ns0#Usage_Data @(ns0#Public : true) : [{
+								ns0#Type_Data @(ns0#Primary: true): [{
+									ns0#Type_Reference: {
+										ns0#ID @(ns0#"type"	: 'Communication_Usage_Type_ID') : 'HOME'
+									}
+								}]
+							}]
+						}]
+					},
+					ns0#Name_Data: {
+						ns0#Legal_Name_Data: {
+							ns0#Name_Detail_Data: {
+								ns0#Country_Reference: {
+									ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code') : p('wday.country')
+								},
+								ns0#First_Name	: payload.firstName,
+								ns0#Last_Name	: payload.lastName
+							}
+						}
+					}
+				}
+			},
+			ns0#Hire_Date: now() as Date,
+			ns0#Hire_Employee_Event_Data: {
+				ns0#Employee_External_ID_Data: {
+					ns0#External_ID @(ns0#System_ID: vars.systemId) : [{
+						ns0#External_ID: payload.personalNumber
+					}]
+				},
+				ns0#Employee_Type_Reference: {
+					ns0#ID @(ns0#"type": 'Employee_Type_ID') : 'Regular'
+				},
+				ns0#Hire_Reason_Reference: {
+					ns0#ID @(ns0#"type"	: 'General_Event_Subcategory_ID') : 'Hire_Employee_New_Hire_Fill_Vacancy'
+				},
+				ns0#Position_Details: {
+					ns0#Position_Title: payload.title default null,
+					ns0#Default_Hours: 40,
+					ns0#Scheduled_Hours: 40,
+					ns0#Job_Profile_Reference: {
+						ns0#ID @(ns0#"type": 'Job_Profile_ID') : p('wday.jobprofileId')
+					},
+					ns0#Location_Reference: {
+						ns0#ID @(ns0#"type": 'Location_ID') : p('wday.location')
+					},
+					ns0#Pay_Rate_Type_Reference : {
+						ns0#ID @(ns0#"type": 'Pay_Rate_Type_ID') : 'Salary'
+					},
+					ns0#Position_Time_Type_Reference : {
+						ns0#ID @(ns0#"type": 'Position_Time_Type_ID') : 'Full_time'
+					}
+				}
+			},
+			ns0#Organization_Reference: {
+				ns0#ID @(ns0#"type": 'Organization_Reference_ID') : p('wday.organization')
+			}
+		}
+	}
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="workerData" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<logger level="INFO" doc:name="log insert" doc:id="f1078e7e-7570-469d-b531-3f9861fe8bad" message="INSERT REQUEST #[payload]" />
+					<workday:invoke doc:name="create workday employee" doc:id="2edb3724-eb42-4db6-af75-291d19ad2780" config-ref="Workday_Config" service="Staffing" operation="Hire_Employee" />
+					<set-payload value="#[vars.workerData]" doc:name="Set output data" doc:id="6d419693-1971-4356-a31c-e2d1f2933102" />
+				</batch:step>
+				<batch:step name="updateWorkerStep" doc:id="78a74ab4-9b91-416d-985a-acda2ac377eb" acceptExpression="#[payload.employeeId != null]">
+					<ee:transform doc:name="Map to ChangePreferredNameRequestType" doc:id="b5017899-cf8e-45e7-afb5-7098d5c051f7">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+	ns0#Change_Preferred_Name_Request : {
+		ns0#Change_Preferred_Name_Data : {
+			ns0#Name_Data : {
+				ns0#First_Name : payload.firstName,
+				ns0#Last_Name  : payload.lastName,
+				ns0#Country_Reference : {
+					ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code'): p('wday.country')
+				}
+			},
+			ns0#Worker_Reference : {
+				ns0#ID @(ns0#"type"	: 'Employee_ID') : payload.employeeId
+			}
+		}
+	}
+}	
+]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<logger level="INFO" doc:name="log update" doc:id="1ad628f1-850b-4613-8616-062a11fd25ba" message="UPDATE REQUEST :  #[payload]" />
+					<workday:invoke doc:name="update workday employee" doc:id="f0ce4725-c142-4586-98ca-7d7178c257af" config-ref="Workday_Config" service="Human_Resources" operation="Change_Preferred_Name" />
+            </batch:step>
+        </batch:process-records>
+        <batch:on-complete>
+                <scatter-gather doc:name="Scatter-Gather" doc:id="ef2964ef-0b85-4c6c-a5ee-b834df639e7b" >
+                    <route >
+                        <logger level="INFO" doc:name="Migration process has finished!" doc:id="b7575d38-7dbd-4602-9186-1bbb25234896" message="Migration process has finished!" />
+                    </route>
+                    <route >
+                        <ee:transform doc:name="Prepare migration result email" doc:id="c84b4bc4-5a65-41c1-9d0c-f1ebd3d8db7a" >
+                            <ee:message >
+                                <ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+"Migration Report: \n"
+ 
+++ "\n Time [milliseconds]: "         ++ payload.elapsedTimeInMillis!
+++ "\n Total Records: "                ++ payload.totalRecords!
+++ "\n Successful Records: "        ++ payload.successfulRecords!
+++ "\n Failed Records: "            ++ payload.failedRecords!
+++ "\n Loaded Records: "            ++ payload.loadedRecords!
+++ "\n Processed Records: "         ++ payload.processedRecords!]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <email:send config-ref="Gmail_SMTP" doc:name="Send email" doc:id="5896eaa9-dd10-47a2-a6fc-6319b11dbd06" fromAddress="${mail.from}" subject="${mail.subject}" >
+                            <email:to-addresses >
+                                <email:to-address value="${mail.to}" />
+                            </email:to-addresses>
+                        </email:send>
+                    </route>
+                </scatter-gather>
+            </batch:on-complete>
+    </batch:job>
+</flow>
+<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e" >
+    <flow-ref doc:name="migrateEmployeesBatch" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0" name="migrateEmployees"/>
+    <error-handler >
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71" type="ANY">
+            <flow-ref doc:name="errorHandlingFlow" doc:id="afdaf73c-0137-4d60-84f6-5c41234771a3" name="errorHandlingFlow" />
+        </on-error-propagate>
+    </error-handler>
+</flow>
+</mule>
+
+
+        
