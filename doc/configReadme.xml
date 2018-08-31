@@ -70,7 +70,7 @@ After this, to trigger the use case you just need to hit the local HTTP Listener
 + sap.jco.lang `EN`
 + sap.jco.ashost `example.domain.com`
 
-**SMPT Services configuration**
+**SMTP Services configuration**
 + smtp.host `smtp.gmail.com`
 + smtp.port `587`
 + smtp.user `sender%40gmail.com`
@@ -89,9 +89,7 @@ There are no special considerations regarding API calls.
         </section>
         <section id="default_endpoints_xml">
 		<![CDATA[
-This is the file where you will find the inbound and outbound sides of your integration app.
-This Anypoint Template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
-This flow has Exception Strategy that basically consists on invoking the *defaultChoiceExceptionStrategy* defined in *errorHandling.xml* file.
+
 For the purpose of this particular Anypoint Template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
 
 $H$H#  Inbound Flow
@@ -101,6 +99,7 @@ $H$H#  Inbound Flow
 + The host name for all endpoints in your CloudHub configuration should be defined as `localhost`. CloudHub will then route requests from your application domain URL to the endpoint.
 + The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Employees migrated and filtered by the criteria specified.
 ]]>
+
         </section>
         <section id="default_business_logic_xml">
 		<![CDATA[

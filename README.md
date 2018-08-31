@@ -154,7 +154,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + sap.jco.lang `EN`
 + sap.jco.ashost `example.domain.com`
 
-**SMPT Services configuration**
+**SMTP Services configuration**
 + smtp.host `smtp.gmail.com`
 + smtp.port `587`
 + smtp.user `sender%40gmail.com`
@@ -200,9 +200,6 @@ Finally during the *On Complete* stage the Anypoint Template will log output sta
 
 
 ## endpoints.xml<a name="endpointsxml"/>
-This is the file where you will find the inbound and outbound sides of your integration app.
-This Anypoint Template has only an [HTTP Inbound Endpoint](http://www.mulesoft.org/documentation/display/current/HTTP+Endpoint+Reference) as the way to trigger the use case.
-This flow has Exception Strategy that basically consists on invoking the *defaultChoiceExceptionStrategy* defined in *errorHandling.xml* file.
 For the purpose of this particular Anypoint Template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
 
 ###  Inbound Flow
