@@ -11,16 +11,16 @@ This template is subject to the conditions of the <a href="https://s3.amazonaws.
 <!-- Use Case (start) -->
 As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint Template should serve as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behavior when an employee already exists in the destination system.
+This Anypoint template serves as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behavior when an employee already exists in the destination system.
 
-As implemented, this Anypoint Template leverages the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+As implemented, this template leverages the Mule batch module.
 The batch job is divided into *Process* and *On Complete* stages.
 
-Before the *Process* stage the Anypoint Template will go to the SAP and query all the employees that match the filtering criteria. The criteria is based on available filtering fields for standard BAPI BAPI_EMPLOYEE_GETDATA. 
+Before the *Process* stage the template will go to the SAP and query all the employees that match the filtering criteria. The criteria is based on available filtering fields for standard BAPI BAPI_EMPLOYEE_GETDATA. 
 
 During the *Process* stage the template checks if there is an employee with such an id in the Workday and if it is present the template will update it using Change_Preferred_Name function, if it isn't - the template creates it using HIRE_EMPLOYEE function call.
 
-Finally during the *On Complete* stage the Anypoint Template will both log output statistics data into the console and send a notification email with the results of the batch execution.
+Finally during the *On Complete* stage the template will both log output statistics data into the console and send a notification email with the results of the batch execution.
 <!-- Use Case (end) -->
 
 # Considerations
@@ -29,7 +29,7 @@ Finally during the *On Complete* stage the Anypoint Template will both log outpu
 <!-- Default Considerations (end) -->
 
 <!-- Considerations (start) -->
-To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
+To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made for the template to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
 
 ## Disclaimer
 
@@ -107,12 +107,12 @@ After you import your template into Anypoint Studio, follow these steps to run i
 
 ### Running on Mule Standalone
 Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`. 
-After this, to trigger the use case you just need to hit the local HTTP Listener with the port you configured in the properties file. If this is, for instance, `9090` then you should hit: `http://localhost:9090/migrateemployees` and this will output a summary report and send it in the email.
+After this, to trigger the use case you just need to browse to the local HTTP Listener with the port you configured in the properties file. If this is, for instance, `9090` then you should browse to: `http://localhost:9090/migrateemployees` and this will output a summary report and send it in the email.
 
 ## Running on CloudHub
 When creating your application in CloudHub, go to Runtime Manager > Manage Application > Properties to set the environment variables listed in "Properties to Configure" as well as the mule.env value.
 <!-- Running on Cloudhub (start) -->
-Once your app is all set and started, supposing you choose `sapemployeemigration` as domain name to trigger the use case you just need to hit `http://sapemployeemigration.cloudhub.io/migrateemployees` and report will be sent to the email configured.
+Once your app is all set and started, supposing you choose `sapemployeemigration` as domain name to trigger the use case you just need to browse to `http://sapemployeemigration.cloudhub.io/migrateemployees` and report will be sent to the email configured.
 <!-- Running on Cloudhub (end) -->
 
 ### Deploying a Template in CloudHub
@@ -128,7 +128,7 @@ To use this template, configure properties such as credentials, configurations, 
 + http.port `9090`
 + page.size `100`
 
-**Workday Connector configuration**
+**Workday Connector Configuration**
 + wday.username `user`
 + wday.tenant `tenant`
 + wday.password `secret`
@@ -148,7 +148,7 @@ To use this template, configure properties such as credentials, configurations, 
 + wday.system.id `System id`
 + wday.email `john.doe@aol.com`
 
-**SAP Connector configuration**
+**SAP Connector Configuration**
 + sap.jco.user `user`
 + sap.jco.passwd `secret`
 + sap.jco.sysnr `14`
@@ -156,7 +156,7 @@ To use this template, configure properties such as credentials, configurations, 
 + sap.jco.lang `EN`
 + sap.jco.ashost `example.domain.com`
 
-**SMTP Services configuration**
+**SMTP Services Configuration**
 + smtp.host `smtp.gmail.com`
 + smtp.port `587`
 + smtp.user `sender%40gmail.com`
@@ -193,13 +193,13 @@ This file provides the configuration for connectors and configuration properties
 
 ## businessLogic.xml
 <!-- Default Business Logic XML (start) -->
-Functional aspect of the Anypoint Template is implemented on this XML, directed by a batch job that will be responsible for creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
+Functional aspect of the template is implemented on this XML, directed by a batch job that will be responsible for creations/updates. The several message processors constitute four high level actions that fully implement the logic of this template:
 
 1. Job execution is invoked from triggerFlow (endpoints.xml).
-2. During the *Process* stage, each Employee will be filtered depending on existing of matching Employee in the Workday instance. The matching is performed by querying a Workday instance for an entry with the given External Reference ID.
+2. During the *Process* stage, each Employee is filtered depending on existing of matching Employee in the Workday instance. The matching is performed by querying a Workday instance for an entry with the given External Reference ID.
 3. The next step will insert a new record into the Workday instance if there was none found in the previous step or update it if there was found matching employee.
 
-Finally during the *On Complete* stage the Anypoint Template will log output statistics data into the console and send report to an email you choose.<!-- Default Business Logic XML (end) -->
+Finally during the *On Complete* stage the template logs output statistics data into the console and send report to an email you choose.<!-- Default Business Logic XML (end) -->
 
 <!-- Business Logic XML (start) -->
 
@@ -207,7 +207,7 @@ Finally during the *On Complete* stage the Anypoint Template will log output sta
 
 ## endpoints.xml
 <!-- Default Endpoints XML (start) -->
-For the purpose of this particular Anypoint Template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
+For the purpose of this particular template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
 
 ###  Inbound Flow
 **HTTP Inbound Endpoint** - Start Report Generation
