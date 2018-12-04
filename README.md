@@ -2,7 +2,12 @@
 # Anypoint Template: Sap to Workday Employee Migration	
 
 <!-- Header (start) -->
+Moves a large set of employees from SAP to Workday. It is triggered by an HTTP call either manually or programmatically. Employees are upserted so that the migration can be run multiple times without worrying about creating duplicates. This template uses batch to efficiently process many records at a time.
 
+![1ccc3e5f-6e38-45e3-af9c-f978882d97de-image.png](https://exchange2-file-upload-service-kprod.s3.us-east-1.amazonaws.com:443/1ccc3e5f-6e38-45e3-af9c-f978882d97de-image.png)
+
+## Template Requirements
+Install Workday HCM - Human Resources and Workday HCM - Staffing modules that you can find on the [Workday connector page](https://www.mulesoft.com/exchange/com.mulesoft.connectors/mule-workday-connector/).
 <!-- Header (end) -->
 
 # License Agreement
@@ -11,16 +16,15 @@ This template is subject to the conditions of the <a href="https://s3.amazonaws.
 <!-- Use Case (start) -->
 As a SAP admin I want to migrate employees to Workday.
 
-This Anypoint template serves as a foundation for the process of migrating Employees from SAP instance to Workday, being able to specify available filtering criteria and desired behavior when an employee already exists in the destination system.
+This template helps you migrate employees from a SAP instance to Workday, and specifying available filtering criteria and desired behavior when an employee already exists in the destination system.
 
-As implemented, this template leverages the Mule batch module.
-The batch job is divided into *Process* and *On Complete* stages.
+This template leverages the Mule batch module. The batch job is divided into *Process* and *On Complete* stages.
 
-Before the *Process* stage the template will go to the SAP and query all the employees that match the filtering criteria. The criteria is based on available filtering fields for standard BAPI BAPI_EMPLOYEE_GETDATA. 
+Before the *Process* stage the template goes to SAP and queries all the employees that match the filtering criteria. The criteria is based on available filtering fields for the standard BAPI BAPI_EMPLOYEE_GETDATA value. 
 
-During the *Process* stage the template checks if there is an employee with such an id in the Workday and if it is present the template will update it using Change_Preferred_Name function, if it isn't - the template creates it using HIRE_EMPLOYEE function call.
+During the *Process* stage the template checks if there is an employee with such an ID in Workday and if present, the template updates it using Change_Preferred_Name function, if the ID isn't in Workday, the template creates it using HIRE_EMPLOYEE function call.
 
-Finally during the *On Complete* stage the template will both log output statistics data into the console and send a notification email with the results of the batch execution.
+Finally during the *On Complete* stage the template logs output statistics data in the console and sends a notification email with the results of the batch execution.
 <!-- Use Case (end) -->
 
 # Considerations
@@ -29,13 +33,12 @@ Finally during the *On Complete* stage the template will both log output statist
 <!-- Default Considerations (end) -->
 
 <!-- Considerations (start) -->
-To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made for the template to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
+To make this template run, there are certain preconditions that must be considered for the preparations in both source and destination systems, that must be made for the template to run smoothly. Failing to do so could lead to unexpected behavior of the template.
 
 ## Disclaimer
 
-This Anypoint template uses a few private Maven dependencies from Mulesoft in order to work. If you intend to run this template with Maven support, you need to add three extra dependencies for SAP to the pom.xml file.
+This template uses a few private Maven dependencies from Mulesoft to work. If you intend to run this template with Maven support, you need to add extra dependencies for SAP to the pom.xml file.
 <!-- Considerations (end) -->
-
 
 ## SAP Considerations
 
@@ -43,24 +46,15 @@ Here's what you need to know to get this template to work with SAP.
 
 ### As a Data Source
 
-The SAP backend system is used as a source of data. The SAP connector is used to send and receive the data from the SAP backend. The connector can either use RFC calls of BAPI functions and/or IDoc messages for data exchange, and needs to be properly customized per the "Properties to Configure" section.
-
-
-
-
-
+The SAP backend system is used as a source of data. The SAP connector is used to send and receive data from the SAP backend. The connector can either use RFC calls of BAPI functions and/or IDoc messages for data exchange, and needs to be properly customized per the "Properties to Configure" section.
 
 ## Workday Considerations
 
+The following sections provide more info.
 
 ### As a Data Destination
 
 There are no considerations with using Workday as a data destination.
-
-
-
-
-
 
 # Run it!
 Simple steps to get this template running.
@@ -107,12 +101,12 @@ After you import your template into Anypoint Studio, follow these steps to run i
 
 ### Running on Mule Standalone
 Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`. 
-After this, to trigger the use case you just need to browse to the local HTTP Listener with the port you configured in the properties file. If this is, for instance, `9090` then you should browse to: `http://localhost:9090/migrateemployees` and this will output a summary report and send it in the email.
+After this, to trigger the use case you just need to browse to the local HTTP Listener with the port you configured in the properties file. If this is, for instance, `9090` then you should browse to: `http://localhost:9090/migrateemployees`. Browsing to this URL causes the application to output the summary report and send it in the email.
 
 ## Running on CloudHub
 When creating your application in CloudHub, go to Runtime Manager > Manage Application > Properties to set the environment variables listed in "Properties to Configure" as well as the mule.env value.
 <!-- Running on Cloudhub (start) -->
-Once your app is all set and started, supposing you choose `sapemployeemigration` as domain name to trigger the use case you just need to browse to `http://sapemployeemigration.cloudhub.io/migrateemployees` and report will be sent to the email configured.
+Once your app is all set and started, if you choose `sapemployeemigration` as the domain name to trigger the use case, you just need to browse to `http://sapemployeemigration.cloudhub.io/migrateemployees` and the report is sent to the email you configured.
 <!-- Running on Cloudhub (end) -->
 
 ### Deploying a Template in CloudHub
@@ -179,13 +173,15 @@ This brief guide provides a high level understanding of how this template is bui
 * config.xml
 * businessLogic.xml
 * endpoints.xml
-* errorHandling.xml<!-- Customize it (start) -->
+* errorHandling.xml
+<!-- Customize it (start) -->
 
 <!-- Customize it (end) -->
 
 ## config.xml
 <!-- Default Config XML (start) -->
-This file provides the configuration for connectors and configuration properties. Only change this file to make core changes to the connector processing logic. Otherwise, all parameters that can be modified should instead be in a properties file, which is the recommended place to make changes.<!-- Default Config XML (end) -->
+This file provides the configuration for connectors and configuration properties. Only change this file to make core changes to the connector processing logic. Otherwise, all parameters that can be modified should instead be in a properties file, which is the recommended place to make changes.
+<!-- Default Config XML (end) -->
 
 <!-- Config XML (start) -->
 
@@ -193,13 +189,13 @@ This file provides the configuration for connectors and configuration properties
 
 ## businessLogic.xml
 <!-- Default Business Logic XML (start) -->
-Functional aspect of the template is implemented on this XML, directed by a batch job that will be responsible for creations/updates. The several message processors constitute four high level actions that fully implement the logic of this template:
+Functionals aspect of the template are implemented in this XML file, which is directed by a batch job and is responsible for creates and updates. The several message processors constitute these high level actions that fully implement the logic of this template:
 
 1. Job execution is invoked from triggerFlow (endpoints.xml).
-2. During the *Process* stage, each Employee is filtered depending on existing of matching Employee in the Workday instance. The matching is performed by querying a Workday instance for an entry with the given External Reference ID.
-3. The next step will insert a new record into the Workday instance if there was none found in the previous step or update it if there was found matching employee.
-
-Finally during the *On Complete* stage the template logs output statistics data into the console and send report to an email you choose.<!-- Default Business Logic XML (end) -->
+2. During the *Process* stage, each employee is filtered depending on whether a matching employee exists in the Workday instance. The matching is performed by querying a Workday instance for an entry with each External Reference ID.
+3. Inserts a new record in the Workday instance if the employee wasn't found in the previous step, or updates it if there is a matching employee.
+4. During the *On Complete* stage the template logs output statistics data into the console and sends report to an email you choose.
+<!-- Default Business Logic XML (end) -->
 
 <!-- Business Logic XML (start) -->
 
@@ -207,14 +203,15 @@ Finally during the *On Complete* stage the template logs output statistics data 
 
 ## endpoints.xml
 <!-- Default Endpoints XML (start) -->
-For the purpose of this particular template the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
+For the purpose of this particular template, the *triggerFlow* executes the Batch Job in *businessLogic.xml* which handles all the logic of it.
 
 ###  Inbound Flow
 **HTTP Inbound Endpoint** - Start Report Generation
 + `${http.port}` is set as a property to be defined either on a property file or in CloudHub environment variables.
-+ The path configured by default is `migrateemployees` and you are free to change for the one you prefer.
-+ The host name for all endpoints in your CloudHub configuration should be defined as `localhost`. CloudHub will then route requests from your application domain URL to the endpoint.
-+ The endpoint is configured as a *request-response* since as a result of calling it the response will be the total of Employees migrated and filtered by the criteria specified.<!-- Default Endpoints XML (end) -->
++ The path configured by default is `migrateemployees`, which you are free to change to one you prefer.
++ The host name for all endpoints in your CloudHub configuration should be defined as `localhost`. CloudHub routes requests from your application domain URL to the endpoint.
++ The endpoint is configured as a *request-response* since as a result of calling it, the response is the total of employees migrated and filtered by the criteria specified.
+<!-- Default Endpoints XML (end) -->
 
 <!-- Endpoints XML (start) -->
 
@@ -222,7 +219,8 @@ For the purpose of this particular template the *triggerFlow* executes the Batch
 
 ## errorHandling.xml
 <!-- Default Error Handling XML (start) -->
-This file handles how your integration reacts depending on the different exceptions. This file provides error handling that is referenced by the main flow in the business logic.<!-- Default Error Handling XML (end) -->
+This file handles how your integration reacts depending on the different exceptions. This file provides error handling that is referenced by the main flow in the business logic.
+<!-- Default Error Handling XML (end) -->
 
 <!-- Error Handling XML (start) -->
 
