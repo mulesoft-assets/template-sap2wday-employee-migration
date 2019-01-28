@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
-	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+    xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 	xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:sap="http://www.mulesoft.org/schema/mule/sap"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -11,16 +11,15 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
 http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 	<munit:config name="test-suite.xml" />
 	<configuration-properties doc:name="Configuration properties" doc:id="63c1b35f-cc42-48f4-b55a-e98901b1fc0e" file="mule.test.properties" />
 	<munit:before-test name="test-suiteBefore_Test" description="Before tests actions" doc:id="0cbbb475-ab2e-4a97-8e2f-e3a346ebb72a" >
 		<flow-ref doc:name="Reference to userInWorkdaySubFlow" doc:id="14a11ef5-62eb-4d99-9434-e23a95e1613a" name="userInWorkdaySubFlow"/>
-		<ee:transform doc:name="Set workerData variable" doc:id="a8e4cb81-f7e3-445d-8ce8-081598d55d8b">
+		<ee:transform doc:name="Prepare test data and store old data" doc:id="a8e4cb81-f7e3-445d-8ce8-081598d55d8b">
 			<ee:message />
 			<ee:variables>
-				<ee:set-variable variableName="workerData"><![CDATA[%dw 2.0
+				<ee:set-variable variableName="oldData" ><![CDATA[%dw 2.0
 output application/java
 ---
 {
@@ -28,21 +27,10 @@ output application/java
 	lastName   : payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.Name_Data.Last_Name,
 	employeeId : payload.Employee.Employee_Data.Employee_ID
 }]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<ee:transform doc:name="Prepare test data and store old data" doc:id="a33864cc-0860-4484-a23b-a2803201c037" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
 				<ee:set-variable variableName="newData" ><![CDATA[%dw 2.0
 output application/java
 ---
 "Test " ++ randomInt(1000)]]></ee:set-variable>
-				<ee:set-variable variableName="oldData" ><![CDATA[%dw 2.0
-output application/java
----
-vars.workerData
-]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<munit-tools:mock-when doc:name="Mock email processor to avoid sending email" doc:id="0b92b051-e404-4366-af77-f34a5bc38a6f" processor="email:send" />
@@ -72,7 +60,7 @@ var filterWorker = (payload filter ($.personalNumber == p('wday.testuser.persona
 				<ee:message>
 				</ee:message>
 				<ee:variables>
-				<ee:set-variable variableName="workerData"><![CDATA[%dw 2.0
+					<ee:set-variable variableName="testData" ><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.*Name_Data map (nameData) -> {
@@ -82,7 +70,7 @@ payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.*Name_Data map (na
 			</ee:transform>
 		</munit:execution>
 		<munit:validation >
-			<munit-tools:assert-that doc:name="Assert that record was updated" doc:id="833274d1-507d-450b-a70f-2b0bfe7b6cc1" expression="#[vars.workerData[1].FirstName]" is="#[MunitTools::equalTo(vars.newData)]" message="Record wasn't updated" />
+			<munit-tools:assert-that doc:name="Assert that record was updated" doc:id="833274d1-507d-450b-a70f-2b0bfe7b6cc1" expression="#[vars.testData[1].FirstName]" is="#[MunitTools::equalTo(vars.newData)]" message="Record wasn't updated" />
 		</munit:validation>
 	</munit:test>
 	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="17a801e4-c85a-48dd-bf4b-36e4f95857d6" >
