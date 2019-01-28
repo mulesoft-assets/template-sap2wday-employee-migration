@@ -1,59 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap"
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:sap="http://www.mulesoft.org/schema/mule/sap"
       xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-      xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
-      xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+      xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
-http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
-	<flow name="migrateEmployees" doc:id="884f86c5-66e1-4701-bb9b-594c2a60abf3" >
-    <ee:transform doc:name="Set XML input" doc:id="4648e80d-79e5-4d04-a7af-e5bdb831c068" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/xml
----
-{
-  "BAPI_EMPLOYEE_GETDATA": {
-    "import": {
-      "LASTNAME_M": "*EVANS14*"
-    }
-  }
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<sap:execute-synchronous-remote-function-call key="BAPI_EMPLOYEE_GETDATA" doc:name="Query SAP for Employees" doc:id="0e92782f-9ac3-4a9f-ac02-74bb02cc9294" config-ref="SAP_config"/>
-		<ee:transform doc:name="Transform data to wday workers" doc:id="0c50175e-a04b-4ce9-a5cc-f6221ae64cd2">
-						<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-if(not isEmpty(payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA))
-payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA.*row map{
-	firstName       : $.FIRSTNAME,
-	lastName        : $.LAST_NAME,
-	gender          : $.GENDER,
-	title           : $.TITLE,
-	personalNumber  : $.PERNO
-} else []]]></ee:set-payload>
-						</ee:message>
-			<ee:variables>
-				<ee:set-variable variableName="systemId" ><![CDATA[%dw 2.0
-output application/java
----
-p('wday.system.id')]]></ee:set-variable>
-			</ee:variables>
-					</ee:transform>
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+	<flow name="businessLogicFlow" doc:id="884f86c5-66e1-4701-bb9b-594c2a60abf3" >
 		<batch:job jobName="migrateEmployeesBatch" doc:id="79b373e6-1aeb-43a9-9dfe-8ac0d2f31fdc" blockSize="${page.size}">
         <batch:process-records >
 				<batch:step name="getUserInWdayStep" doc:id="232087de-e311-49c1-a890-439c65ea1af2" >
-					<ee:transform doc:name="create wday request" doc:id="a9f351e1-2703-48bd-9de9-7c93bf0e008c" >
-						<ee:message >
-							<ee:set-payload ><![CDATA[%dw 2.0
+					<ee:transform doc:name="Create wday request" doc:id="a9f351e1-2703-48bd-9de9-7c93bf0e008c">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
 output application/xml
 ns ns0 urn:com.workday/bsvc
 ---
@@ -65,25 +30,24 @@ ns ns0 urn:com.workday/bsvc
 			}
 		}
 	}
-}
-]]></ee:set-payload>
+}]]></ee:set-payload>
 						</ee:message>
-						<ee:variables >
-							<ee:set-variable variableName="workerData" ><![CDATA[%dw 2.0
+						<ee:variables>
+							<ee:set-variable variableName="workerData"><![CDATA[%dw 2.0
 output application/java
 ---
 payload]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-					<workday:invoke doc:name="query workday for existing employee" doc:id="82777701-090d-4459-8853-9ad614e2cd54" config-ref="Workday_Config" service="Human_Resources" operation="Get_Workers"/>
-					<ee:transform doc:name="Extend payload about employeeId" doc:id="baab932d-0c17-4420-a8d7-7899c65fbd2c" >
-						<ee:message >
-							<ee:set-payload ><![CDATA[%dw 2.0
+					<workday:human-resources operation="Get_Employee" doc:name="Query workday for existing employee" doc:id="304a408d-e040-4a62-a874-5aa177c2662a" config-ref="Workday_Config" />
+					<ee:transform doc:name="Extend payload about employeeId" doc:id="baab932d-0c17-4420-a8d7-7899c65fbd2c">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 vars.workerData ++
-	{
-		employeeId: payload.body.Employee.Employee_Data.Employee_ID
+{
+	employeeId: payload.Employee.Employee_Data.Employee_ID
 }]]></ee:set-payload>
 						</ee:message>
 					</ee:transform>
@@ -208,38 +172,38 @@ output application/java
 payload]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-					<logger level="INFO" doc:name="log insert" doc:id="f1078e7e-7570-469d-b531-3f9861fe8bad" message="INSERT REQUEST #[payload]" />
-					<workday:invoke doc:name="create workday employee" doc:id="2edb3724-eb42-4db6-af75-291d19ad2780" config-ref="Workday_Config" service="Staffing" operation="Hire_Employee" />
+					<logger level="INFO" doc:name="Log insert" doc:id="f1078e7e-7570-469d-b531-3f9861fe8bad" message="INSERT REQUEST #[payload]" />
+					<workday:staffing operation="Hire_Employee" doc:name="Create workday employee" doc:id="74d6e1d2-22ed-4e2c-9ba8-4c110814d711" config-ref="Workday_Config"/>
 					<set-payload value="#[vars.workerData]" doc:name="Set output data" doc:id="6d419693-1971-4356-a31c-e2d1f2933102" />
 				</batch:step>
 				<batch:step name="updateWorkerStep" doc:id="78a74ab4-9b91-416d-985a-acda2ac377eb" acceptExpression="#[payload.employeeId != null]">
-					<ee:transform doc:name="Map to ChangePreferredNameRequestType" doc:id="b5017899-cf8e-45e7-afb5-7098d5c051f7">
-						<ee:message>
-							<ee:set-payload><![CDATA[%dw 2.0
+					<ee:transform doc:name="Map to ChangePreferredNameRequestType" doc:id="19be84a5-0443-4876-910d-755ed694d93e" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
 output application/xml
 ns ns0 urn:com.workday/bsvc
 ---
 {
 	ns0#Change_Preferred_Name_Request : {
 		ns0#Change_Preferred_Name_Data : {
-			ns0#Name_Data : {
-				ns0#First_Name : payload.firstName,
-				ns0#Last_Name  : payload.lastName,
-				ns0#Country_Reference : {
-					ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code'): p('wday.country')
-				}
-			},
 			ns0#Worker_Reference : {
 				ns0#ID @(ns0#"type"	: 'Employee_ID') : payload.employeeId
+			},
+			ns0#Name_Data : {
+				ns0#Country_Reference : {
+					ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code'): p('wday.country')
+				},
+				ns0#First_Name : payload.firstName,
+				ns0#Last_Name  : payload.lastName
 			}
 		}
 	}
-}	
+}
 ]]></ee:set-payload>
 						</ee:message>
 					</ee:transform>
-					<logger level="INFO" doc:name="log update" doc:id="1ad628f1-850b-4613-8616-062a11fd25ba" message="UPDATE REQUEST :  #[payload]" />
-					<workday:invoke doc:name="update workday employee" doc:id="f0ce4725-c142-4586-98ca-7d7178c257af" config-ref="Workday_Config" service="Human_Resources" operation="Change_Preferred_Name" />
+					<logger level="INFO" doc:name="Log update" doc:id="4bb9bab3-4c9c-42a2-a5e9-6734af5be6f4" message="UPDATE REQUEST :  #[payload]" />
+					<workday:human-resources operation="Change_Preferred_Name" doc:name="Update workday employee" doc:id="fd9e54a8-596d-4659-b467-05f7e3d18fa3" config-ref="Workday_Config" />
             </batch:step>
         </batch:process-records>
         <batch:on-complete>
@@ -255,8 +219,8 @@ output text/plain
 ---
 "Migration Report: \n"
  
-++ "\n Time [milliseconds]: "         ++ payload.elapsedTimeInMillis!
-++ "\n Total Records: "                ++ payload.totalRecords!
+++ "\n Time [milliseconds]: "       ++ payload.elapsedTimeInMillis!
+++ "\n Total Records: "             ++ payload.totalRecords!
 ++ "\n Successful Records: "        ++ payload.successfulRecords!
 ++ "\n Failed Records: "            ++ payload.failedRecords!
 ++ "\n Loaded Records: "            ++ payload.loadedRecords!
@@ -273,8 +237,47 @@ output text/plain
             </batch:on-complete>
     </batch:job>
 </flow>
-<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e" >
-    <flow-ref doc:name="migrateEmployeesBatch" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0" name="migrateEmployees"/>
+	<sub-flow name="queryFromSAPSubFlow" doc:id="4575bf42-75f6-458c-9b79-0f4b4bf4703d">
+		<ee:transform doc:name="Set XML input" doc:id="4648e80d-79e5-4d04-a7af-e5bdb831c068">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+  "BAPI_EMPLOYEE_GETDATA": {
+    "import": {
+      "LASTNAME_M": "*EVANS14*"
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<sap:execute-synchronous-remote-function-call key="BAPI_EMPLOYEE_GETDATA" doc:name="Query SAP for Employees" doc:id="0e92782f-9ac3-4a9f-ac02-74bb02cc9294" config-ref="SAP_config" />
+		<ee:transform doc:name="Transform data to wday workers" doc:id="0c50175e-a04b-4ce9-a5cc-f6221ae64cd2">
+						<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+if(not isEmpty(payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA))
+payload.BAPI_EMPLOYEE_GETDATA.tables.PERSONAL_DATA.*row map{
+	firstName       : $.FIRSTNAME,
+	lastName        : $.LAST_NAME,
+	gender          : $.GENDER,
+	title           : $.TITLE,
+	personalNumber  : $.PERNO
+} else []]]></ee:set-payload>
+						</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="systemId"><![CDATA[%dw 2.0
+output application/java
+---
+p('wday.system.id')]]></ee:set-variable>
+			</ee:variables>
+					</ee:transform>
+	</sub-flow>
+	<flow name="mainFlow" doc:id="7c0a5bef-b3d5-442f-bff3-10d038f69a5e" >
+    <flow-ref doc:name="Reference to queryFromSAPSubFlow" doc:id="d42e71d7-49ac-4ab0-90ed-36f85c33e58c" name="queryFromSAPSubFlow"/>
+		<flow-ref doc:name="Reference to businessLogicFlow" doc:id="91360ede-4d71-44c7-9b64-8ee762e04ea0" name="businessLogicFlow"/>
     <error-handler >
         <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71" type="ANY">
             <flow-ref doc:name="errorHandlingFlow" doc:id="afdaf73c-0137-4d60-84f6-5c41234771a3" name="errorHandlingFlow" />

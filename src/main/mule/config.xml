@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
 
+    <global-property name="mule.env" value="dev" doc:name="Global Property" />
+    <configuration-properties file="common.properties" doc:id="d7395c8c-d2a5-4b00-bf9f-c6e676a5f6cb" doc:name="Configuration properties" />
+    <configuration-properties file="mule.${mule.env}.properties" doc:id="d74d6885-fb1d-4977-bdd4-e56097a16368" doc:name="Configuration properties" />
+    
     <http:listener-config name="HTTP_Listener_config" doc:id="910654bf-9fd9-4073-bad4-cf951b7f0022" doc:name="HTTP Listener config">
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
@@ -17,16 +21,7 @@
         <tls:trust-store insecure="true" />
     </tls:context>
 
-    <configuration-properties file="mule-artifact.properties" doc:id="46877740-aac5-4812-8728-4718689aa9ec" doc:name="Configuration properties" />
-    <configuration-properties file="common.properties" doc:id="dffa4da7-cc5c-4ecb-922e-1115b4387354" doc:name="Configuration properties" />
-    <configuration-properties file="mule.${mule.env}.properties" doc:id="674beef8-9485-40a7-99b9-0685c9b7e863" doc:name="Configuration properties" />
-    <global-property name="mule.env" value="dev" doc:name="Global Property" />
-
-    <workday:config name="Workday_Config" doc:id="61b5beaf-0455-455f-9906-53cf079c004c" doc:name="Workday Config">
-        <workday:basic-connection hostName="${wday.host}" password="${wday.password}" tenantName="${wday.tenant}" username="${wday.username}">
-            <workday:transport>
-                <workday:default-http-dispatcher-provider />
-            </workday:transport>
-        </workday:basic-connection>
-    </workday:config>
+    <workday:config-version-30-config name="Workday_Config" doc:name="Workday Config version 30" doc:id="783b2e76-a1e4-4349-b606-804bcf0e9f74">
+        <workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.host}" responseTimeout="25000"/>
+    </workday:config-version-30-config>
 </mule>
