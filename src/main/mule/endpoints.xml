@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
             path="/migrateemployees">
             <ee:repeatable-file-store-stream />
         </http:listener>
-        <flow-ref doc:name="mainFlow" doc:id="9c665dd4-7df3-4e0d-a1eb-01ac63781ce7" name="mainFlow" />
+        <flow-ref doc:name="Reference to mainFlow" doc:id="9c665dd4-7df3-4e0d-a1eb-01ac63781ce7" name="mainFlow" />
         <ee:transform doc:name="Build response" doc:id="2abddd58-c707-435a-a004-ec5ba9107429">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0

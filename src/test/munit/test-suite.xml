@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:workday="http://www.mulesoft.org/schema/mule/workday" xmlns:sap="http://www.mulesoft.org/schema/mule/sap"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
+http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+	<munit:config name="test-suite.xml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="63c1b35f-cc42-48f4-b55a-e98901b1fc0e" file="mule.test.properties" />
+	<munit:before-test name="test-suiteBefore_Test" description="Before tests actions" doc:id="0cbbb475-ab2e-4a97-8e2f-e3a346ebb72a" >
+		<flow-ref doc:name="Reference to userInWorkdaySubFlow" doc:id="14a11ef5-62eb-4d99-9434-e23a95e1613a" name="userInWorkdaySubFlow"/>
+		<ee:transform doc:name="Prepare test data and store old data" doc:id="a8e4cb81-f7e3-445d-8ce8-081598d55d8b">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="oldData" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	firstName  : payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.Name_Data.First_Name,
+	lastName   : payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.Name_Data.Last_Name,
+	employeeId : payload.Employee.Employee_Data.Employee_ID
+}]]></ee:set-variable>
+				<ee:set-variable variableName="newData" ><![CDATA[%dw 2.0
+output application/java
+---
+"Test " ++ randomInt(1000)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<munit-tools:mock-when doc:name="Mock email processor to avoid sending email" doc:id="0b92b051-e404-4366-af77-f34a5bc38a6f" processor="email:send" />
+	</munit:before-test>
+	<munit:test name="test-suiteTest" description="MUnit Test" doc:id="af7abd32-21e4-45fe-8d83-9f963689008a" >
+		<munit:execution>
+			<flow-ref doc:name="Reference to queryFromSAPSubFlow" doc:id="80b27188-8ea6-4a4b-ad0d-c68a34ebe63f" name="queryFromSAPSubFlow"/>
+			<ee:transform doc:name="Filter test records and modify employee first name" doc:id="4dfc3ed2-46da-4477-b650-e912574d690a">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var filterWorker = (payload filter ($.personalNumber == p('wday.testuser.personal.number')))[0]
+---
+[filterWorker - "firstName" ++ {
+    "firstName": vars.newData
+}]]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Reference to businessLogicFlow" doc:id="241c37fc-c022-40b2-bc75-12ff72d3472b" name="businessLogicFlow"/>
+			<scripting:execute engine="groovy" doc:id="46b3ad88-ae1d-4228-9441-e6b61ca46711" doc:name="Sleep for 30s until the processing is completed">
+				<scripting:code>sleep(30000)</scripting:code>
+			</scripting:execute>
+			<flow-ref doc:name="Reference to userInWorkdaySubFlow" doc:id="1c9bc9d3-58d7-405f-acb2-e853543ffa78" name="userInWorkdaySubFlow" />
+			<ee:transform doc:name="Extend payload about employee first name" doc:id="2555676e-13ba-4418-821d-b66c93cbbe5b">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="testData" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.*Name_Data map (nameData) -> {
+	FirstName  : nameData.First_Name
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that record was updated" doc:id="833274d1-507d-450b-a70f-2b0bfe7b6cc1" expression="#[vars.testData[1].FirstName]" is="#[MunitTools::equalTo(vars.newData)]" message="Record wasn't updated" />
+		</munit:validation>
+	</munit:test>
+	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="17a801e4-c85a-48dd-bf4b-36e4f95857d6" >
+		<ee:transform doc:name="Prepare request with old data" doc:id="1ada85ef-3320-406e-978f-25ee995b4c06" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+	ns0#Change_Preferred_Name_Request : {
+		ns0#Change_Preferred_Name_Data : {
+			ns0#Worker_Reference : {
+				ns0#ID @(ns0#"type"	: 'Employee_ID') : vars.oldData.employeeId
+			},
+			ns0#Name_Data : {
+				ns0#Country_Reference : {
+					ns0#ID @(ns0#"type"	: 'ISO_3166-1_Alpha-3_Code'): p('wday.country')
+				},
+				ns0#First_Name : vars.oldData.firstName,
+				ns0#Last_Name  : vars.oldData.lastName
+			}
+		}
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<workday:human-resources operation="Change_Preferred_Name" doc:name="Update workday employee" doc:id="18e77bf7-ecc5-42eb-9949-0f93dda9b2fc" config-ref="Workday_Config" />
+	</munit:after-test>
+	<sub-flow name="userInWorkdaySubFlow" doc:id="e49f38cb-f5f1-4e48-8e9f-50f4602cb72b" >
+		<ee:transform doc:name="Set systemId variable" doc:id="31faa87d-c4ea-4b57-9d6c-0d8d65fdd7a8">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="systemId"><![CDATA[%dw 2.0
+output application/java
+---
+p('wday.system.id')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Create request to Workday" doc:id="01491158-1a43-4a7f-92c9-1b2763d86c74">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:com.workday/bsvc
+---
+{
+	ns0#Employee_Get: {
+		ns0#Employee_Reference: {
+			ns0#Integration_ID_Reference : {
+				ns0#ID @(ns0#System_ID : vars.systemId) : p('wday.testuser.personal.number')
+			}
+		}
+	}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+				</ee:variables>
+			</ee:transform>
+		<workday:human-resources operation="Get_Employee" doc:name="Query to Workday for existing employee" doc:id="b69c0dd1-65e5-427d-8f24-4349a28e8963" config-ref="Workday_Config" />
+	</sub-flow>
+</mule>
