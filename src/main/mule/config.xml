@@ -4,24 +4,24 @@
     <global-property name="mule.env" value="dev" doc:name="Global Property" />
     <configuration-properties file="common.properties" doc:id="d7395c8c-d2a5-4b00-bf9f-c6e676a5f6cb" doc:name="Configuration properties" />
     <configuration-properties file="mule.${mule.env}.properties" doc:id="d74d6885-fb1d-4977-bdd4-e56097a16368" doc:name="Configuration properties" />
-    
+
     <http:listener-config name="HTTP_Listener_config" doc:id="910654bf-9fd9-4073-bad4-cf951b7f0022" doc:name="HTTP Listener config">
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
-    
+
     <sap:outbound-config name="SAP_config" doc:id="05a0a973-2c03-4cea-8247-fda5959f14e9" doc:name="SAP Outbound">
         <sap:simple-connection-provider-connection applicationServerHost="${sap.jco.ashost}" client="${sap.jco.client}" language="${sap.jco.lang}" password="${sap.jco.passwd}" systemNumber="${sap.jco.sysnr}" username="${sap.jco.user}" />
     </sap:outbound-config>
-    
+
     <email:smtp-config name="Gmail_SMTP" doc:id="8ba14ccd-a5b8-43a8-8281-cd433c852f2b" doc:name="Email SMTP">
         <email:smtps-connection host="${smtp.host}" password="${smtp.password}" port="${smtp.port}" tlsContext="TLS_Context" user="${smtp.user}" />
     </email:smtp-config>
-    
+
     <tls:context name="TLS_Context" doc:id="233e532c-8296-4ddd-ac67-e2b7984b3609" doc:name="TLS Context">
         <tls:trust-store insecure="true" />
     </tls:context>
 
     <workday:config-version-30-config name="Workday_Config" doc:name="Workday Config version 30" doc:id="783b2e76-a1e4-4349-b606-804bcf0e9f74">
-        <workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.host}" responseTimeout="25000"/>
+        <workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.host}" responseTimeout="${wday.responseTimeout}"/>
     </workday:config-version-30-config>
 </mule>
