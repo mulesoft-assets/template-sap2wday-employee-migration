@@ -68,15 +68,9 @@ payload.Employee.Employee_Data.Personal_Info_Data.Person_Data.*Name_Data map (na
 }]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
-		</munit:execution>
-		<munit:validation >
-			<munit-tools:assert-that doc:name="Assert that record was updated" doc:id="833274d1-507d-450b-a70f-2b0bfe7b6cc1" expression="#[vars.testData[1].FirstName]" is="#[MunitTools::equalTo(vars.newData)]" message="Record wasn't updated" />
-		</munit:validation>
-	</munit:test>
-	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="17a801e4-c85a-48dd-bf4b-36e4f95857d6" >
-		<ee:transform doc:name="Prepare request with old data" doc:id="1ada85ef-3320-406e-978f-25ee995b4c06" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+			<ee:transform doc:name="Prepare request with old data" doc:id="6804e27b-5fbc-4bc7-8761-25d2b8a08c35">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
 output application/xml
 ns ns0 urn:com.workday/bsvc
 ---
@@ -97,10 +91,14 @@ ns ns0 urn:com.workday/bsvc
 	}
 }
 ]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<workday:human-resources operation="Change_Preferred_Name" doc:name="Update workday employee" doc:id="18e77bf7-ecc5-42eb-9949-0f93dda9b2fc" config-ref="Workday_Config" />
-	</munit:after-test>
+				</ee:message>
+			</ee:transform>
+			<workday:human-resources operation="Change_Preferred_Name" doc:name="Update workday employee" doc:id="bc52fea1-8083-4fb6-b920-05d2eb904250" config-ref="Workday_Config" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that record was updated" doc:id="833274d1-507d-450b-a70f-2b0bfe7b6cc1" expression="#[vars.testData[1].FirstName]" is="#[MunitTools::equalTo(vars.newData)]" message="Record wasn't updated" />
+		</munit:validation>
+	</munit:test>
 	<sub-flow name="userInWorkdaySubFlow" doc:id="e49f38cb-f5f1-4e48-8e9f-50f4602cb72b" >
 		<ee:transform doc:name="Set systemId variable" doc:id="31faa87d-c4ea-4b57-9d6c-0d8d65fdd7a8">
 			<ee:message>
