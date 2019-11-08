@@ -20,8 +20,8 @@
     <tls:context name="TLS_Context" doc:id="233e532c-8296-4ddd-ac67-e2b7984b3609" doc:name="TLS Context">
         <tls:trust-store insecure="true" />
     </tls:context>
-
-    <workday:config-version-30-config name="Workday_Config" doc:name="Workday Config version 30" doc:id="783b2e76-a1e4-4349-b606-804bcf0e9f74">
-        <workday:basic-authentication-api-v30-connection username="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.host}" responseTimeout="${wday.responseTimeout}"/>
-    </workday:config-version-30-config>
+    
+	<workday:config-version-32-config name="Workday_Config" doc:name="Workday Config version 32" doc:id="2b36f2d2-e236-4356-b37d-8f6e8e4ba823" >
+		<workday:basic-authentication-api-v32-connection userName="${wday.username}" password="${wday.password}" tenantName="${wday.tenant}" hostName="${wday.host}"/>
+	</workday:config-version-32-config>
 </mule>

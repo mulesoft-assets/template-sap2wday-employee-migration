@@ -184,7 +184,7 @@ ns ns0 urn:com.workday/bsvc
 {
 	ns0#Change_Preferred_Name_Request : {
 		ns0#Change_Preferred_Name_Data : {
-			ns0#Worker_Reference : {
+			ns0#Person_Reference : {
 				ns0#ID @(ns0#"type"	: 'Employee_ID') : payload.employeeId
 			},
 			ns0#Name_Data : {
